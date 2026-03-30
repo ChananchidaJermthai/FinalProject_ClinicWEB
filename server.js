@@ -8,12 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
+// บอกให้ Express รู้ว่าไฟล์ static (html, css, js) อยู่ที่โฟลเดอร์ปัจจุบัน
 app.use(express.static(path.join(__dirname, './')));
 
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT, 
+    port: process.env.DB_PORT || 3306, 
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -27,12 +27,18 @@ db.connect((err) => {
     console.log('✅ Connected to MySQL Database on Cloud');
 });
 
-
+// --- ส่วนจัดการเส้นทางไฟล์หน้าเว็บ (Routing) ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
-// ----------------------------------------------
 
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// --- API สำหรับดึงข้อมูล ---
+
+// ดึงรายการนัดหมาย
 app.get('/api/appointments', (req, res) => {
     db.query('SELECT * FROM appointments', (err, result) => {
         if (err) return res.status(500).send(err);
@@ -40,6 +46,7 @@ app.get('/api/appointments', (req, res) => {
     });
 });
 
+// ดึงรายการลูกค้า
 app.get('/api/customers', (req, res) => {
     db.query('SELECT * FROM customers', (err, result) => {
         if (err) return res.status(500).send(err);
@@ -47,6 +54,14 @@ app.get('/api/customers', (req, res) => {
     });
 });
 
+app.get('/api/inventory', (req, res) => {
+    db.query('SELECT * FROM inventory', (err, result) => {
+        if (err) return res.status(500).send(err);
+        res.json(result);
+    });
+});
+
+// อัปเดตสต็อกสินค้า
 app.put('/api/stock/:id', (req, res) => {
     const { quantity } = req.body;
     const { id } = req.params;
@@ -55,14 +70,4 @@ app.put('/api/stock/:id', (req, res) => {
         if (err) return res.status(500).send(err);
 
         const logMsg = `Updated stock ID: ${id} to ${quantity}`;
-        db.query('INSERT INTO staff_logs (staff_name, action_text) VALUES (?, ?)', ['Admin', logMsg]);
-        
-        res.send("Stock Updated and Logged!");
-    });
-});
-
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`✅ Server is running on port ${PORT}`);
-});
+        db

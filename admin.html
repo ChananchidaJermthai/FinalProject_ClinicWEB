@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard - Aura Clinic</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f4f7f6; color: #333; }
         .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
         th { background-color: #ff99cc; color: white; }
         .status-pending { color: orange; font-weight: bold; }
+        button { padding: 5px 10px; cursor: pointer; border-radius: 4px; border: 1px solid #ddd; background: #fff; }
+        button:hover { background: #f0f0f0; }
+        .btn-update { background-color: #4CAF50; color: white; border: none; margin-left: 10px; }
+        .btn-update:hover { background-color: #45a049; }
+        input[type="number"] { width: 60px; padding: 5px; text-align: center; }
     </style>
 </head>
 <body>
@@ -39,6 +44,7 @@
                 <tr>
                     <th>รายการ</th>
                     <th>คงเหลือ</th>
+                    <th>หน่วย</th>
                     <th>จัดการ</th>
                 </tr>
             </thead>
@@ -48,31 +54,70 @@
     </div>
 
     <script>
-       
+        // 1. ดึงข้อมูลนัดหมาย
         fetch('/api/appointments')
             .then(res => res.json())
             .then(data => {
                 const tbody = document.getElementById('appBody');
+                tbody.innerHTML = ''; 
                 data.forEach(app => {
                     tbody.innerHTML += `
                         <tr>
-                            <td>${app.customer_name}</td>
-                            <td>${app.service_name}</td>
-                            <td>${new Date(app.app_date).toLocaleDateString()}</td>
+                            <td>${app.customer_name || 'ไม่ระบุ'}</td>
+                            <td>${app.service_type || 'ทั่วไป'}</td>
+                            <td>${app.appointment_date ? new Date(app.appointment_date).toLocaleDateString() : '-'}</td>
                             <td class="status-pending">${app.status}</td>
                         </tr>
                     `;
                 });
-            });
+            })
+            .catch(err => console.error('Error fetching appointments:', err));
 
         
-        function updateStock(id, newQty) {
+        function loadStock() {
+            fetch('/api/inventory') 
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('stockBody');
+                    tbody.innerHTML = '';
+                    data.forEach(item => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${item.item_name}</td>
+                                <td>
+                                    <input type="number" id="qty-${item.id}" value="${item.quantity}">
+                                </td>
+                                <td>${item.unit}</td>
+                                <td>
+                                    <button class="btn-update" onclick="updateStock(${item.id})">บันทึก</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch(err => console.error('Error loading stock:', err));
+        }
+
+       
+        function updateStock(id) {
+            const newQty = document.getElementById(`qty-${id}`).value;
             fetch(`/api/stock/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantity: newQty })
-            }).then(() => alert('อัปเดตสต็อกและบันทึก Log เรียบร้อย!'));
+                body: JSON.stringify({ quantity: parseInt(newQty) })
+            })
+            .then(res => {
+                if(res.ok) {
+                    alert('อัปเดตสต็อกและบันทึก Log เรียบร้อย!');
+                    loadStock(); 
+                } else {
+                    alert('เกิดข้อผิดพลาดในการอัปเดต');
+                }
+            });
         }
+
+       
+        loadStock();
     </script>
 </body>
 </html>
