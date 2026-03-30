@@ -1,83 +1,48 @@
-<script>
-    // ตั้งค่า URL หลัก (ใช้ของ Render คุณเอง)
-    const API_BASE_URL = 'https://finalproject-clinicweb.onrender.com';
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Aura Clinic</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #ff99cc; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Aura Clinic Backend</h1>
+    <div class="card">
+        <h2>📦 คลังเวชภัณฑ์</h2>
+        <table>
+            <thead>
+                <tr><th>รายการ</th><th>คงเหลือ</th><th>หน่วย</th></tr>
+            </thead>
+            <tbody id="stockBody"></tbody>
+        </table>
+    </div>
 
-    function loadAppointments() {
-        console.log("กำลังโหลดข้อมูลนัดหมาย...");
-        fetch(`${API_BASE_URL}/api/appointments`)
-            .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
-                return res.json();
-            })
-            .then(data => {
-                console.log("ข้อมูลนัดหมายที่ได้รับ:", data);
-                const tbody = document.getElementById('appBody');
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">ไม่มีข้อมูลนัดหมาย</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = data.map(app => `
-                    <tr>
-                        <td>${app.customer_name || 'ไม่ระบุ'}</td>
-                        <td>${app.service_name || 'ทั่วไป'}</td>
-                        <td>${app.app_date ? new Date(app.app_date).toLocaleDateString('th-TH') : '-'}</td>
-                        <td class="status-pending">${app.status || 'รอดำเนินการ'}</td>
-                    </tr>
-                `).join('');
-            })
-            .catch(err => {
-                console.error('Error Appointments:', err);
-                document.getElementById('appBody').innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">โหลดข้อมูลล้มเหลว: ${err.message}</td></tr>`;
-            });
-    }
+    <script>
+        
+        const API_URL = ''; 
 
-    function loadStock() {
-        console.log("กำลังโหลดข้อมูลสต็อก...");
-        fetch(`${API_BASE_URL}/api/inventory`) 
-            .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
-                return res.json();
-            })
-            .then(data => {
-                console.log("ข้อมูลสต็อกที่ได้รับ:", data);
-                const tbody = document.getElementById('stockBody');
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">ไม่มีข้อมูลสินค้า</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = data.map(item => `
-                    <tr>
-                        <td>${item.item_name}</td>
-                        <td><input type="number" id="qty-${item.id}" value="${item.quantity}"></td>
-                        <td>${item.unit}</td>
-                        <td><button class="btn-update" onclick="updateStock(${item.id})">บันทึก</button></td>
-                    </tr>
-                `).join('');
-            })
-            .catch(err => {
-                console.error('Error Inventory:', err);
-                document.getElementById('stockBody').innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">โหลดข้อมูลล้มเหลว: ${err.message}</td></tr>`;
-            });
-    }
-
-    function updateStock(id) {
-        const newQty = document.getElementById(`qty-${id}`).value;
-        fetch(`${API_BASE_URL}/api/stock/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quantity: parseInt(newQty) })
-        })
-        .then(res => {
-            if(res.ok) {
-                alert('อัปเดตเรียบร้อย!');
-                loadStock();
-            } else {
-                alert('อัปเดตไม่สำเร็จ');
-            }
-        });
-    }
-
-    
-    loadAppointments();
-    loadStock();
-</script>
+        function loadData() {
+            fetch(API_URL + '/api/inventory')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('stockBody');
+                    tbody.innerHTML = data.map(item => `
+                        <tr>
+                            <td>${item.item_name}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.unit}</td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(err => console.error('Error:', err));
+        }
+        loadData();
+    </script>
+</body>
+</html>
