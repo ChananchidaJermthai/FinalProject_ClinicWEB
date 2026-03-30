@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// บอกให้ Express รู้ว่าไฟล์ static (html, css, js) อยู่ที่โฟลเดอร์ปัจจุบัน
+
 app.use(express.static(path.join(__dirname, './')));
 
 const db = mysql.createConnection({
@@ -21,53 +21,49 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) {
-        console.error('❌ Error connecting to the database:', err);
+        console.error('❌ Database Connection Error:', err);
         return;
     }
-    console.log('✅ Connected to MySQL Database on Cloud');
+    console.log('✅ Connected to MySQL Database');
 });
 
-// --- ส่วนจัดการเส้นทางไฟล์หน้าเว็บ (Routing) ---
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
 
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
-// --- API สำหรับดึงข้อมูล ---
 
-// ดึงรายการนัดหมาย
 app.get('/api/appointments', (req, res) => {
     db.query('SELECT * FROM appointments', (err, result) => {
-        if (err) return res.status(500).send(err);
+        if (err) return res.status(500).json(err);
         res.json(result);
     });
 });
 
-// ดึงรายการลูกค้า
-app.get('/api/customers', (req, res) => {
-    db.query('SELECT * FROM customers', (err, result) => {
-        if (err) return res.status(500).send(err);
-        res.json(result);
-    });
-});
 
 app.get('/api/inventory', (req, res) => {
     db.query('SELECT * FROM inventory', (err, result) => {
-        if (err) return res.status(500).send(err);
+        if (err) return res.status(500).json(err);
         res.json(result);
     });
 });
 
-// อัปเดตสต็อกสินค้า
+
 app.put('/api/stock/:id', (req, res) => {
     const { quantity } = req.body;
     const { id } = req.params;
     
     db.query('UPDATE inventory SET quantity = ? WHERE id = ?', [quantity, id], (err) => {
-        if (err) return res.status(500).send(err);
+        if (err) return res.status(500).json(err);
 
         const logMsg = `Updated stock ID: ${id} to ${quantity}`;
-        db
+        db.query('INSERT INTO staff_logs (staff_name, action_text) VALUES (?, ?)', ['Admin', logMsg], (logErr) => {
+            if (logErr) console.error('Log Error:', logErr);
+            res.send("Stock Updated and Logged!");
+        });
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Server running on port ${PORT}`);
+});
