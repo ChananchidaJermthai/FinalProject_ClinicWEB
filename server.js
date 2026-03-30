@@ -1,22 +1,22 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const path = require('path'); 
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('./'));
 
+
+app.use(express.static(path.join(__dirname, './')));
 
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
+    port: process.env.DB_PORT, 
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    // ถ้าใช้ Railway ไม่ต้องใส่ SSL แต่ถ้าเชื่อมไม่ติดให้เพิ่มบรรทัดล่าง
-    // ssl: { rejectUnauthorized: false } 
 });
 
 db.connect((err) => {
@@ -28,6 +28,10 @@ db.connect((err) => {
 });
 
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+// ----------------------------------------------
 
 app.get('/api/appointments', (req, res) => {
     db.query('SELECT * FROM appointments', (err, result) => {
@@ -56,6 +60,7 @@ app.put('/api/stock/:id', (req, res) => {
         res.send("Stock Updated and Logged!");
     });
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
