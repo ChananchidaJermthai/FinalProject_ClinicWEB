@@ -4,37 +4,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ทีมแพทย์ | Aura Skin & Aesthetic Clinic</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Sarabun', sans-serif; margin: 0; line-height: 1.6; color: #333; background: #fffcfd; }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            line-height: 1.6;
+            color: #333;
+            background: #fffcfd;
+        }
 
-        /* HEADER เหมือน index */
-        header { background: #ffffff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .logo { font-size: 26px; font-weight: bold; color: #db2777; }
-        nav a { margin-left: 20px; text-decoration: none; color: #555; font-weight: 500; transition: color 0.3s; }
-        nav a:hover { color: #db2777; }
+        header {
+            background: #ffffff;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; text-align: center; }
-        .section-title { color: #9d174d; margin-bottom: 40px; font-size: 32px; }
+        .logo {
+            font-size: 26px;
+            font-weight: bold;
+            color: #db2777;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
 
-        .doctor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .doctor-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s; }
-        .doctor-card:hover { transform: translateY(-5px); }
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
 
-        .bear-photo { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
-        .bear-1 { background-color: #A52A2A; }
-        .bear-2 { background-color: #F5F5DC; color: #333; }
-        .bear-3 { background-color: #FFB6C1; }
+        nav a:hover {
+            color: #db2777;
+        }
 
-        .doctor-info h3 { color: #db2777; margin-bottom: 5px; }
-        .doctor-info p { color: #777; font-style: italic; margin-top: 0; }
-        .specialty { background: #fdf2f8; color: #9d174d; padding: 5px 10px; border-radius: 20px; font-size: 0.9rem; display: inline-block; margin-top: 10px; }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            text-align: center;
+        }
 
-        /* FOOTER เหมือน index */
-        footer { background: #1f2937; color: white; padding: 50px 5%; text-align: center; margin-top: 50px; }
-        .footer-info { display: flex; justify-content: space-around; max-width: 1100px; margin: 0 auto 30px; text-align: left; flex-wrap: wrap; gap: 30px; padding: 0 20px; }
-        .footer-section h4 { color: #f472b6; border-bottom: 2px solid #374151; padding-bottom: 10px; margin-bottom: 15px; }
-        .footer-section p { margin: 8px 0; font-size: 0.9rem; color: #ccc; }
-        .copyright { font-size: 0.8rem; color: #999; margin-top: 30px; border-top: 1px solid #374151; padding-top: 20px; }
+        .section-title {
+            color: #9d174d;
+            margin-bottom: 40px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .doctor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .doctor-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .doctor-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: block;
+            object-fit: cover;
+            border: 4px solid #fce7f3;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: #fff;
+        }
+
+        .doctor-info h3 {
+            color: #db2777;
+            margin-bottom: 5px;
+        }
+
+        .doctor-info p {
+            color: #777;
+            font-style: italic;
+            margin-top: 0;
+        }
+
+        .specialty {
+            background: #fdf2f8;
+            color: #9d174d;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 50px 5%;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .footer-info {
+            display: flex;
+            justify-content: space-around;
+            max-width: 1100px;
+            margin: 0 auto 30px;
+            text-align: left;
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        .footer-section h4 {
+            color: #f472b6;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .footer-section p {
+            margin: 8px 0;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .copyright {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 30px;
+            border-top: 1px solid #374151;
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -56,7 +173,7 @@
 
     <div class="doctor-grid">
         <div class="doctor-card">
-            <div class="bear-photo bear-1"></div>
+            <img src="DoctorBearBrown.jpg" alt="นพ. แบร์รี่ บราวน์" class="doctor-photo">
             <div class="doctor-info">
                 <h3>นพ. แบร์รี่ บราวน์</h3>
                 <p>(คุณหมอหมีน้ำตาล)</p>
@@ -65,7 +182,7 @@
         </div>
 
         <div class="doctor-card">
-            <div class="bear-photo bear-2"></div>
+            <img src="DoctorBearWhite.jpg" alt="พญ. โพล่า ไวท์" class="doctor-photo">
             <div class="doctor-info">
                 <h3>พญ. โพล่า ไวท์</h3>
                 <p>(คุณหมอหมีขาว)</p>
@@ -74,11 +191,11 @@
         </div>
 
         <div class="doctor-card">
-            <div class="bear-photo bear-3"></div>
+            <img src="DoctorPanda.jpg" alt="นพ. พิงค์กี้ พูห์" class="doctor-photo">
             <div class="doctor-info">
-                <h3>นพ. พิงค์กี้ พูห์</h3>
-                <p>(คุณหมอหมีชมพู)</p>
-                <span class="specialty">ผู้เชี่ยวชาญด้านการปรับรูปหน้า</span>
+                <h3>นพ. เเพนด้า พูห์</h3>
+                <p>(คุณหมอหมีแพนด้า)</p>
+                <span class="specialty">ผู้เชี่ยวชาญด้านความงามเฉพาะบุคคล</span>
             </div>
         </div>
     </div>

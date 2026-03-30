@@ -4,62 +4,208 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>บริการของเรา | Aura Skin & Aesthetic Clinic</title>
-    <style>
-        body { font-family: 'Sarabun', sans-serif; margin: 0; line-height: 1.6; color: #333; background: #fffcfd; }
-        header { background: #ffffff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .logo { font-size: 26px; font-weight: bold; color: #db2777; }
-        nav a { margin-left: 20px; text-decoration: none; color: #555; font-weight: 500; transition: 0.3s; }
-        nav a:hover { color: #db2777; }
-        
-        .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; }
-        .section-title { text-align: center; color: #9d174d; margin-bottom: 50px; font-size: 36px; }
 
-        /* อัปเกรด Service Grid */
-        .service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
-        .service-card { 
-            background: white; 
-            border-radius: 25px; 
-            padding: 40px 30px; 
-            text-align: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
-            border: 1px solid #fdf2f8; 
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            line-height: 1.6;
+            color: #333;
+            background: #fffcfd;
+        }
+
+        header {
+            background: #ffffff;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: bold;
+            color: #db2777;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: #db2777;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: #9d174d;
+            margin-bottom: 50px;
+            font-size: 32px;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 25px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid #fdf2f8;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
         }
-        .service-card:hover { 
-            transform: translateY(-12px); 
-            box-shadow: 0 20px 40px rgba(219,39,119,0.15); 
+
+        .service-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(219,39,119,0.15);
             border-color: #f9a8d4;
         }
-        
-        .icon-circle { 
-            width: 80px; height: 80px; background: #fff1f2; color: #db2777; 
-            font-size: 40px; line-height: 80px; border-radius: 50%; 
-            margin: 0 auto 25px; transition: 0.3s; 
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: #fff1f2;
+            color: #db2777;
+            font-size: 40px;
+            line-height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            transition: 0.3s;
         }
-        .service-card:hover .icon-circle { background: #db2777; color: white; transform: rotate(10deg); }
 
-        .price-tag { color: #db2777; font-size: 22px; font-weight: bold; margin: 15px 0; display: block; }
-        .book-now { 
-            display: inline-block; padding: 10px 25px; background: #db2777; color: white; 
-            text-decoration: none; border-radius: 25px; font-size: 0.9rem; font-weight: bold; 
-            transition: 0.3s; opacity: 0; transform: translateY(10px);
+        .service-card:hover .icon-circle {
+            background: #db2777;
+            color: white;
+            transform: rotate(10deg);
         }
-        .service-card:hover .book-now { opacity: 1; transform: translateY(0); }
 
-        /* ส่วนขั้นตอนการรับบริการ */
-        .steps-section { background: white; padding: 80px 5%; margin-top: 50px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center; }
-        .step-item { position: relative; }
-        .step-num { font-size: 50px; font-weight: 900; color: #fff1f2; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); z-index: 1; }
-        .step-text { position: relative; z-index: 2; font-weight: bold; color: #444; }
+        .price-tag {
+            color: #db2777;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0;
+            display: block;
+        }
 
-        /* Footer */
-        footer { background: #1f2937; color: white; padding: 50px 5%; text-align: center; margin-top: 80px; }
-        .footer-info { display: flex; justify-content: space-around; max-width: 1100px; margin: 0 auto 30px; text-align: left; flex-wrap: wrap; gap: 30px; }
-        .footer-section h4 { color: #f472b6; margin-bottom: 15px; }
-        .footer-section p { margin: 8px 0; font-size: 0.9rem; color: #ccc; }
+        .book-now {
+            display: inline-block;
+            padding: 10px 25px;
+            background: #db2777;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: 0.3s;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .service-card:hover .book-now {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .steps-section {
+            background: white;
+            padding: 80px 5%;
+            margin-top: 50px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .step-item {
+            position: relative;
+        }
+
+        .step-num {
+            font-size: 50px;
+            font-weight: 900;
+            color: #fff1f2;
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .step-text {
+            position: relative;
+            z-index: 2;
+            font-weight: bold;
+            color: #444;
+        }
+
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 50px 5%;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .footer-info {
+            display: flex;
+            justify-content: space-around;
+            max-width: 1100px;
+            margin: 0 auto 30px;
+            text-align: left;
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 0 20px;
+        }
+
+        .footer-section h4 {
+            color: #f472b6;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .footer-section p {
+            margin: 8px 0;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .copyright {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 30px;
+            border-top: 1px solid #374151;
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -78,7 +224,7 @@
 
     <div class="container">
         <h1 class="section-title">บริการระดับพรีเมียม (Our Services)</h1>
-        
+
         <div class="service-grid">
             <div class="service-card">
                 <div class="icon-circle">✨</div>
@@ -103,26 +249,18 @@
                 <span class="price-tag">เริ่มต้น 2,999.-</span>
                 <a href="contact.html" class="book-now">จองคิวรับบริการ</a>
             </div>
-
-            <div class="service-card">
-                <div class="icon-circle">💧</div>
-                <h3>Hifu Ultra Lift</h3>
-                <p>ยกกระชับหน้าไม่ต้องผ่าตัด ด้วยคลื่นอัลตร้าซาวด์ความถี่สูง</p>
-                <span class="price-tag">เริ่มต้น 4,900.-</span>
-                <a href="contact.html" class="book-now">จองคิวรับบริการ</a>
-            </div>
         </div>
 
         <div class="steps-section">
-            <h2 style="text-align:center; color:#db2777; margin-bottom:40px;">4 ขั้นตอนสู่ผิวสวย</h2>
+            <h2 class="section-title">ขั้นตอนการรับบริการ</h2>
             <div class="steps-grid">
                 <div class="step-item">
                     <div class="step-num">01</div>
-                    <p class="step-text">ปรึกษาแพทย์เชี่ยวชาญ</p>
+                    <p class="step-text">ปรึกษาปัญหาผิวกับผู้เชี่ยวชาญ</p>
                 </div>
                 <div class="step-item">
                     <div class="step-num">02</div>
-                    <p class="step-text">วิเคราะห์สภาพผิว</p>
+                    <p class="step-text">วิเคราะห์สภาพผิวและวางแผนการรักษา</p>
                 </div>
                 <div class="step-item">
                     <div class="step-num">03</div>
@@ -140,23 +278,20 @@
         <div class="footer-info">
             <div class="footer-section">
                 <h4>Aura Skin Clinic</h4>
-                <p>📍 จังหวัดออร่า (University Project)</p>
+                <p>📍 จังหวัดออร่า (ปลอม 100%)</p>
                 <p>📞 077-xxx-xxxx</p>
-            </div>
-            
-            <div class="footer-section">
-                <h4>Project Members (Group 328B)</h4>
-                <p>1. Itthichai Faengchaiyaphum (30)</p>
-                <p>2. Thipphawan Thipsrinimit (31)</p>
-                <p>3. Chananchida Jermthai (32)</p>
+                <p>💬 Line: @auraclinic_test</p>
             </div>
 
             <div class="footer-section">
-                <h4>Infrastructure</h4>
-                <p>Digital Ocean | Cloudflare | Name.com</p>
+                <h4>รายชื่อผู้จัดทำ (Project Members)</h4>
+                <p>1. Itthichai Faengchaiyaphum (1660705268) กลุ่ม 328B เลขที่ 30</p>
+                <p>2. Thipphawan Thipsrinimit (1660705532) กลุ่ม 328B เลขที่ 31</p>
+                <p>3. Chananchida Jermthai (1660705946) กลุ่ม 328B เลขที่ 32</p>
             </div>
+
         </div>
-        <p style="font-size:0.8rem; color:#999;">&copy; 2026 Aura Skin & Aesthetic Clinic. All Rights Reserved.</p>
+        <p class="copyright">&copy; 2026 Aura Skin & Aesthetic Clinic. All Rights Reserved. | University Project</p>
     </footer>
 
 </body>
