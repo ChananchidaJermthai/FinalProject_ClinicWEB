@@ -11,7 +11,6 @@
         th { background-color: #ff99cc; color: white; }
         .status-pending { color: orange; font-weight: bold; }
         button { padding: 5px 10px; cursor: pointer; border-radius: 4px; border: 1px solid #ddd; background: #fff; }
-        button:hover { background: #f0f0f0; }
         .btn-update { background-color: #4CAF50; color: white; border: none; margin-left: 10px; }
         .btn-update:hover { background-color: #45a049; }
         input[type="number"] { width: 60px; padding: 5px; text-align: center; }
@@ -22,7 +21,7 @@
     <h1>Aura Clinic Backend System</h1>
 
     <div class="card">
-        <h2>📅 รายการนัดหมายล่าสุด (Manage Appointments)</h2>
+        <h2>📅 รายการนัดหมายล่าสุด</h2>
         <table id="appTable">
             <thead>
                 <tr>
@@ -32,14 +31,13 @@
                     <th>สถานะ</th>
                 </tr>
             </thead>
-            <tbody id="appBody">
-                </tbody>
+            <tbody id="appBody"></tbody>
         </table>
     </div>
 
     <div class="card">
         <h2>📦 คลังเวชภัณฑ์ (Manage Stock)</h2>
-        <table id="stockTable">
+        <table>
             <thead>
                 <tr>
                     <th>รายการ</th>
@@ -48,76 +46,41 @@
                     <th>จัดการ</th>
                 </tr>
             </thead>
-            <tbody id="stockBody">
-                </tbody>
+            <tbody id="stockBody"></tbody>
         </table>
     </div>
 
     <script>
-        // 1. ดึงข้อมูลนัดหมาย
-        fetch('/api/appointments')
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.getElementById('appBody');
-                tbody.innerHTML = ''; 
-                data.forEach(app => {
-                    tbody.innerHTML += `
+        
+        function loadAppointments() {
+            fetch('/api/appointments')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('appBody');
+                    tbody.innerHTML = data.map(app => `
                         <tr>
                             <td>${app.customer_name || 'ไม่ระบุ'}</td>
-                            <td>${app.service_type || 'ทั่วไป'}</td>
-                            <td>${app.appointment_date ? new Date(app.appointment_date).toLocaleDateString() : '-'}</td>
-                            <td class="status-pending">${app.status}</td>
+                            <td>${app.service_name || 'ทั่วไป'}</td>
+                            <td>${app.app_date ? new Date(app.app_date).toLocaleDateString() : '-'}</td>
+                            <td class="status-pending">${app.status || 'รอดำเนินการ'}</td>
                         </tr>
-                    `;
-                });
-            })
-            .catch(err => console.error('Error fetching appointments:', err));
+                    `).join('');
+                })
+                .catch(err => console.error('Error:', err));
+        }
 
-        
+    
         function loadStock() {
             fetch('/api/inventory') 
                 .then(res => res.json())
                 .then(data => {
                     const tbody = document.getElementById('stockBody');
-                    tbody.innerHTML = '';
-                    data.forEach(item => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${item.item_name}</td>
-                                <td>
-                                    <input type="number" id="qty-${item.id}" value="${item.quantity}">
-                                </td>
-                                <td>${item.unit}</td>
-                                <td>
-                                    <button class="btn-update" onclick="updateStock(${item.id})">บันทึก</button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                })
-                .catch(err => console.error('Error loading stock:', err));
-        }
-
-       
-        function updateStock(id) {
-            const newQty = document.getElementById(`qty-${id}`).value;
-            fetch(`/api/stock/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantity: parseInt(newQty) })
-            })
-            .then(res => {
-                if(res.ok) {
-                    alert('อัปเดตสต็อกและบันทึก Log เรียบร้อย!');
-                    loadStock(); 
-                } else {
-                    alert('เกิดข้อผิดพลาดในการอัปเดต');
-                }
-            });
-        }
-
-       
-        loadStock();
-    </script>
-</body>
-</html>
+                    tbody.innerHTML = data.map(item => `
+                        <tr>
+                            <td>${item.item_name}</td>
+                            <td><input type="number" id="qty-${item.id}" value="${item.quantity}"></td>
+                            <td>${item.unit}</td>
+                            <td><button class="btn-update" onclick="updateStock(${item.id})">บันทึก</button></td>
+                        </tr>
+                    `).join('');
+                });
