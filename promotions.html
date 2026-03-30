@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรโมชั่น | Aura Skin & Aesthetic Clinic</title>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; margin: 0; line-height: 1.6; color: #333; background: #fffcfd; }
+
+        /* HEADER เหมือน index */
+        header { background: #ffffff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .logo { font-size: 26px; font-weight: bold; color: #db2777; }
+        nav a { margin-left: 20px; text-decoration: none; color: #555; font-weight: 500; transition: color 0.3s; }
+        nav a:hover { color: #db2777; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; }
+        .section-title { text-align: center; color: #9d174d; margin-bottom: 40px; font-size: 32px; }
+
+        /* โปรโมชั่น */
+        .hot-deals { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px; }
+        .deal-card { background: linear-gradient(135deg, #fff5f8 0%, #ffffff 100%); border: 2px solid #ffb6c1; padding: 25px; border-radius: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.04); }
+        .deal-card::before { content: "HOT"; background: #ff4757; color: white; position: absolute; top: 10px; right: -30px; transform: rotate(45deg); width: 100px; font-size: 12px; font-weight: bold; }
+        .price { font-size: 32px; color: #db2777; font-weight: bold; margin: 10px 0; }
+        .old-price { text-decoration: line-through; color: #999; font-size: 18px; }
+
+        .course-list { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.04); }
+        .course-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #eee; }
+        .course-item:last-child { border-bottom: none; }
+        .course-name { font-weight: bold; color: #444; }
+        .course-price { color: #db2777; font-weight: bold; }
+
+        .note { background: #fdf2f8; padding: 20px; border-radius: 10px; margin-top: 40px; font-size: 0.9rem; color: #666; }
+
+        /* FOOTER เหมือน index */
+        footer { background: #1f2937; color: white; padding: 50px 5%; text-align: center; margin-top: 50px; }
+        .footer-info { display: flex; justify-content: space-around; max-width: 1100px; margin: 0 auto 30px; text-align: left; flex-wrap: wrap; gap: 30px; padding: 0 20px; }
+        .footer-section h4 { color: #f472b6; border-bottom: 2px solid #374151; padding-bottom: 10px; margin-bottom: 15px; }
+        .footer-section p { margin: 8px 0; font-size: 0.9rem; color: #ccc; }
+        .copyright { font-size: 0.8rem; color: #999; margin-top: 30px; border-top: 1px solid #374151; padding-top: 20px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Aura Skin Clinic</div>
+    <nav>
+        <a href="index.html">หน้าแรก</a>
+        <a href="about.html">เกี่ยวกับเรา</a>
+        <a href="services.html">บริการ</a>
+        <a href="doctors.html">ทีมแพทย์</a>
+        <a href="promotions.html">โปรโมชั่น</a>
+        <a href="contact.html">ติดต่อเรา</a>
+    </nav>
+</header>
+
+<div class="container">
+    <h1 class="section-title">โปรโมชั่นประจำเดือน (Hot Promotions)</h1>
+
+    <div class="hot-deals">
+        <div class="deal-card">
+            <h3>Aura Bright Laser</h3>
+            <p>กู้ผิวคล้ำเสีย ให้กลับมาใสเร่งด่วน</p>
+            <p class="old-price">ปกติ 2,500.-</p>
+            <p class="price">990.-</p>
+            <small>*จำกัด 1 สิทธิ์ต่อท่าน</small>
+        </div>
+
+        <div class="deal-card">
+            <h3>HIFU Ultra Lift</h3>
+            <p>ยกกระชับทั่วใบหน้า ไม่จำกัดช็อต</p>
+            <p class="old-price">ปกติ 15,900.-</p>
+            <p class="price">5,900.-</p>
+            <small>*แถมฟรี Meso Fat 1 จุด</small>
+        </div>
+
+        <div class="deal-card">
+            <h3>Botox Korea (100u)</h3>
+            <p>ลดกราม ปรับหน้าเรียว เป๊ะทุกมุม</p>
+            <p class="old-price">ปกติ 8,900.-</p>
+            <p class="price">3,999.-</p>
+            <small>*ตัวยาผ่าน อย. ตรวจสอบได้</small>
+        </div>
+    </div>
+
+    <h2 style="color: #9d174d; margin-top: 50px;">แพ็กเกจรายคอร์สสุดคุ้ม</h2>
+
+    <div class="course-list">
+        <div class="course-item">
+            <span class="course-name">คอร์สทรีทเม้นท์ผลักวิตามิน (5 ครั้ง)</span>
+            <span class="course-price">2,500.-</span>
+        </div>
+        <div class="course-item">
+            <span class="course-name">คอร์สรักษาสิวแบบครบวงจร (10 ครั้ง)</span>
+            <span class="course-price">8,900.-</span>
+        </div>
+        <div class="course-item">
+            <span class="course-name">คอร์สฉีดผิวใส Aura Glow (5 ครั้ง)</span>
+            <span class="course-price">4,500.-</span>
+        </div>
+        <div class="course-item">
+            <span class="course-name">คอร์ส Pico Laser ลบรอยดำ (3 ครั้ง)</span>
+            <span class="course-price">12,000.-</span>
+        </div>
+    </div>
+
+    <div class="note">
+        <strong>เงื่อนไขการรับโปรโมชั่น:</strong>
+        <ul>
+            <li>โปรโมชั่นนี้เฉพาะการจองผ่านหน้าเว็บไซต์หรือ Line Official เท่านั้น</li>
+            <li>ไม่สามารถใช้ร่วมกับรายการส่งเสริมการขายอื่นได้</li>
+            <li>กรุณานัดหมายล่วงหน้าอย่างน้อย 1-2 วัน</li>
+            <li>ราคาทั้งหมดเป็นราคาสุทธิ (Net Price)</li>
+        </ul>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-info">
+        <div class="footer-section">
+            <h4>Aura Skin Clinic</h4>
+            <p>📍 จังหวัดออร่า (ปลอม 100%)</p>
+            <p>📞 077-xxx-xxxx</p>
+            <p>💬 Line: @auraclinic_test</p>
+        </div>
+
+        <div class="footer-section">
+            <h4>รายชื่อผู้จัดทำ</h4>
+            <p>1. Itthichai Faengchaiyaphum (1660705268) กลุ่ม 328B เลขที่ 30</p>
+            <p>2. Thipphawan Thipsrinimit (1660705532) กลุ่ม 328B เลขที่ 31</p>
+            <p>3. Chananchida Jermthai (1660705946) กลุ่ม 328B เลขที่ 32</p>
+        </div>
+    </div>
+
+    <p class="copyright">&copy; 2026 Aura Skin & Aesthetic Clinic. All Rights Reserved. | University Project</p>
+</footer>
+
+</body>
+</html>
