@@ -1,104 +1,70 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard - Aura Clinic</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; }
-        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #ff99cc; color: white; }
-        .status-pending { color: orange; font-weight: bold; }
-        input[type="number"] { width: 70px; padding: 5px; }
-        button { padding: 5px 15px; background: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px; }
-        button:hover { background: #45a049; }
-    </style>
-</head>
-<body>
+CREATE DATABASE IF NOT EXISTS aura_clinic CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE aura_clinic;
 
-    <h1>Aura Clinic Backend System</h1>
+DROP TABLE IF EXISTS staff_logs;
+DROP TABLE IF EXISTS appointments;
+DROP TABLE IF EXISTS inventory;
+DROP TABLE IF EXISTS users;
 
-    <div class="card">
-        <h2>📅 รายการนัดหมาย (Appointments)</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ชื่อลูกค้า</th>
-                    <th>บริการ</th>
-                    <th>วันที่</th>
-                    <th>สถานะ</th>
-                </tr>
-            </thead>
-            <tbody id="appBody"></tbody>
-        </table>
-    </div>
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash CHAR(64) NOT NULL,
+    full_name VARCHAR(120) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'admin',
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-    <div class="card">
-        <h2>📦 คลังเวชภัณฑ์ (Inventory)</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>รายการ</th>
-                    <th>คงเหลือ</th>
-                    <th>หน่วย</th>
-                    <th>จัดการ</th>
-                </tr>
-            </thead>
-            <tbody id="stockBody"></tbody>
-        </table>
-    </div>
+CREATE TABLE inventory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    item_name VARCHAR(150) NOT NULL,
+    quantity INT NOT NULL DEFAULT 0,
+    unit VARCHAR(50) NOT NULL,
+    min_quantity INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
-    <script>
-        
-        fetch('/api/appointments')
-            .then(res => res.json())
-            .then(data => {
-                const tbody = document.getElementById('appBody');
-                tbody.innerHTML = data.map(app => `
-                    <tr>
-                        <td>${app.customer_name}</td>
-                        <td>${app.service_name}</td>
-                        <td>${new Date(app.app_date).toLocaleDateString()}</td>
-                        <td class="status-pending">${app.status}</td>
-                    </tr>
-                `).join('');
-            });
+CREATE TABLE appointments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(120) NOT NULL,
+    phone VARCHAR(30) NULL,
+    service_name VARCHAR(120) NOT NULL,
+    app_date DATETIME NOT NULL,
+    status ENUM('pending', 'confirmed', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
+    notes TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
-        
-        function loadStock() {
-            fetch('/api/inventory')
-                .then(res => res.json())
-                .then(data => {
-                    const tbody = document.getElementById('stockBody');
-                    tbody.innerHTML = data.map(item => `
-                        <tr>
-                            <td>${item.item_name}</td>
-                            <td><input type="number" id="qty-${item.id}" value="${item.quantity}"></td>
-                            <td>${item.unit}</td>
-                            <td><button onclick="updateStock(${item.id})">บันทึก</button></td>
-                        </tr>
-                    `).join('');
-                });
-        }
+CREATE TABLE staff_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(120) NOT NULL,
+    action_text VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-        
-        function updateStock(id) {
-            const newQty = document.getElementById(`qty-${id}`).value;
-            fetch(`/api/stock/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantity: parseInt(newQty) })
-            })
-            .then(res => {
-                if(res.ok) {
-                    alert('อัปเดตเรียบร้อย!');
-                    loadStock();
-                }
-            });
-        }
+INSERT INTO users (username, password_hash, full_name, role)
+VALUES
+('admin', SHA2('admin123', 256), 'Clinic Admin', 'admin');
 
-        loadStock();
-    </script>
-</body>
-</html>
+INSERT INTO inventory (item_name, quantity, unit, min_quantity)
+VALUES
+('Botox 50U', 12, 'กล่อง', 5),
+('Vitamin C Serum', 20, 'ขวด', 8),
+('Disposable Syringe 5ml', 100, 'ชิ้น', 30),
+('Medical Gloves', 40, 'กล่อง', 15),
+('Cotton Pads', 75, 'แพ็ก', 20);
+
+INSERT INTO appointments (customer_name, phone, service_name, app_date, status, notes)
+VALUES
+('Ananya S.', '0812345678', 'Facial Treatment', '2026-04-02 10:30:00', 'confirmed', 'นัดครั้งแรก'),
+('Mali P.', '0898765432', 'Botox Consultation', '2026-04-02 14:00:00', 'pending', 'ต้องการปรึกษาก่อนทำ'),
+('Kanya T.', '0861122334', 'IV Drip', '2026-04-03 11:00:00', 'completed', 'ลูกค้าเก่า'),
+('Nida R.', '0839988776', 'Laser Treatment', '2026-04-04 16:30:00', 'cancelled', 'เลื่อนนัด');
+
+INSERT INTO staff_logs (staff_name, action_text)
+VALUES
+('System', 'สร้างข้อมูลเริ่มต้นของระบบ Aura Clinic'),
+('System', 'พร้อมใช้งานสำหรับ admin login');
