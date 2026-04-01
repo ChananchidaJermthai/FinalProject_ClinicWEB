@@ -15,11 +15,10 @@
       --danger: #dc2626;
       --success: #0f9d58;
       --warning: #d97706;
+      --info: #2563eb;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -55,26 +54,16 @@
       max-width: 420px;
     }
 
-    h1, h2, h3 {
-      margin-top: 0;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
+    h1, h2, h3 { margin-top: 0; }
+    .muted { color: var(--muted); }
 
     .grid {
       display: grid;
       gap: 16px;
     }
 
-    .grid-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .grid-4 {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
     .field {
       display: flex;
@@ -83,9 +72,7 @@
       margin-bottom: 14px;
     }
 
-    label {
-      font-weight: 600;
-    }
+    label { font-weight: 600; }
 
     input, select, textarea, button {
       font: inherit;
@@ -112,38 +99,15 @@
       transition: 0.2s ease;
     }
 
-    button:hover {
-      transform: translateY(-1px);
-    }
+    button:hover { transform: translateY(-1px); }
 
-    .btn-primary {
-      background: var(--pink);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--pink-dark);
-    }
-
-    .btn-secondary {
-      background: #eef2ff;
-      color: #333;
-    }
-
-    .btn-danger {
-      background: #fee2e2;
-      color: var(--danger);
-    }
-
-    .btn-success {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .btn-warning {
-      background: #fff7ed;
-      color: var(--warning);
-    }
+    .btn-primary { background: var(--pink); color: white; }
+    .btn-primary:hover { background: var(--pink-dark); }
+    .btn-secondary { background: #eef2ff; color: #333; }
+    .btn-danger { background: #fee2e2; color: var(--danger); }
+    .btn-success { background: #dcfce7; color: #166534; }
+    .btn-warning { background: #fff7ed; color: var(--warning); }
+    .btn-info { background: #dbeafe; color: var(--info); }
 
     .toolbar {
       display: flex;
@@ -154,7 +118,8 @@
       margin-bottom: 16px;
     }
 
-    .toolbar .actions, .toolbar .filters {
+    .toolbar .actions,
+    .toolbar .filters {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
@@ -179,9 +144,7 @@
       color: #7a2154;
     }
 
-    .table-wrap {
-      overflow-x: auto;
-    }
+    .table-wrap { overflow-x: auto; }
 
     .status-badge {
       display: inline-block;
@@ -192,25 +155,10 @@
       text-transform: capitalize;
     }
 
-    .status-pending {
-      background: #fff7ed;
-      color: var(--warning);
-    }
-
-    .status-confirmed {
-      background: #ecfeff;
-      color: #0f766e;
-    }
-
-    .status-completed {
-      background: #ecfdf5;
-      color: var(--success);
-    }
-
-    .status-cancelled {
-      background: #fef2f2;
-      color: var(--danger);
-    }
+    .status-pending { background: #fff7ed; color: var(--warning); }
+    .status-confirmed { background: #ecfeff; color: #0f766e; }
+    .status-completed { background: #ecfdf5; color: var(--success); }
+    .status-cancelled { background: #fef2f2; color: var(--danger); }
 
     .summary-box {
       background: linear-gradient(135deg, #fff1f8, #ffffff);
@@ -238,7 +186,7 @@
       padding: 10px 14px;
       border-radius: 999px;
       background: #fff;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
     }
 
     .message {
@@ -266,13 +214,24 @@
       flex-wrap: wrap;
     }
 
-    .hidden {
-      display: none !important;
+    .help-box {
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 16px;
+      line-height: 1.6;
     }
 
-    .small {
-      font-size: 13px;
+    .restore-box {
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fcfcff;
     }
+
+    .hidden { display: none !important; }
+    .small { font-size: 13px; }
 
     @media (max-width: 900px) {
       .grid-2, .grid-4 {
@@ -282,7 +241,6 @@
   </style>
 </head>
 <body>
-  <!-- Login Section -->
   <section id="loginSection" class="login-wrap">
     <div class="card login-card">
       <h1>🔐 Aura Clinic Admin Login</h1>
@@ -303,23 +261,21 @@
     </div>
   </section>
 
-  <!-- Main Application -->
   <main id="appSection" class="hidden">
     <div class="container">
-      <!-- Top Bar -->
       <div class="topbar">
         <div>
           <h1>🏥 Aura Clinic Admin System</h1>
-          <p class="muted">ระบบจัดการผู้ใช้บริการ คลังสินค้า การนัดหมาย และการค้นหาข้อมูล</p>
+          <p class="muted">ระบบจัดการผู้ใช้บริการ คลังสินค้า การนัดหมาย การค้นหาข้อมูล และการสำรอง/กู้คืนข้อมูล</p>
         </div>
         <div class="actions">
           <div id="currentUser" class="user-badge">กำลังโหลดผู้ใช้...</div>
-          <button id="logoutBtn" class="btn-secondary">ออกจากระบบ</button>
+          <button id="logoutBtn" class="btn-secondary" type="button">ออกจากระบบ</button>
         </div>
       </div>
+
       <div id="appMessage" class="message"></div>
 
-      <!-- Summary Section -->
       <section class="grid grid-4" id="summaryGrid">
         <div class="summary-box">
           <div class="muted">นัดหมายทั้งหมด</div>
@@ -339,7 +295,6 @@
         </div>
       </section>
 
-      <!-- Appointments Management -->
       <section class="card">
         <div class="toolbar">
           <div>
@@ -360,6 +315,7 @@
             <button class="btn-secondary" id="appointmentClearBtn" type="button">ล้าง</button>
           </div>
         </div>
+
         <form id="appointmentForm">
           <input type="hidden" id="appointmentId" />
           <div class="grid grid-2">
@@ -398,7 +354,8 @@
             <button class="btn-secondary hidden" type="button" id="appointmentCancelEditBtn">ยกเลิกการแก้ไข</button>
           </div>
         </form>
-        <div class="table-wrap" style="margin-top: 16px;">
+
+        <div class="table-wrap" style="margin-top:16px;">
           <table>
             <thead>
               <tr>
@@ -416,7 +373,6 @@
         </div>
       </section>
 
-      <!-- Inventory Management -->
       <section class="card">
         <div class="toolbar">
           <div>
@@ -425,13 +381,12 @@
           </div>
           <div class="filters">
             <input id="inventorySearch" placeholder="ค้นหาชื่อรายการ / หน่วย" />
-            <label class="small">
-              <input id="lowStockOnly" type="checkbox" /> แสดงเฉพาะใกล้หมด
-            </label>
+            <label class="small"><input id="lowStockOnly" type="checkbox" /> แสดงเฉพาะใกล้หมด</label>
             <button class="btn-secondary" id="inventorySearchBtn" type="button">ค้นหา</button>
             <button class="btn-secondary" id="inventoryClearBtn" type="button">ล้าง</button>
           </div>
         </div>
+
         <form id="inventoryForm">
           <input type="hidden" id="inventoryId" />
           <div class="grid grid-2">
@@ -457,7 +412,8 @@
             <button class="btn-secondary hidden" type="button" id="inventoryCancelEditBtn">ยกเลิกการแก้ไข</button>
           </div>
         </form>
-        <div class="table-wrap" style="margin-top: 16px;">
+
+        <div class="table-wrap" style="margin-top:16px;">
           <table>
             <thead>
               <tr>
@@ -474,12 +430,42 @@
         </div>
       </section>
 
-      <!-- Activity Logs -->
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <h2>💾 Backup / Restore ข้อมูลระบบ</h2>
+            <p class="muted">สำรองข้อมูลระบบเป็นไฟล์ JSON และกู้คืนข้อมูลกลับเข้าระบบเมื่อเกิดปัญหา</p>
+          </div>
+          <div class="actions">
+            <button id="downloadBackupBtn" class="btn-info" type="button">ดาวน์โหลดไฟล์สำรอง</button>
+          </div>
+        </div>
+
+        <div class="help-box small">
+          <strong>คำแนะนำ:</strong>
+          ระบบนี้เป็น <strong>Manual Backup / Restore</strong> คือผู้ดูแลระบบกดสำรองข้อมูลเองเป็นไฟล์ และใช้ไฟล์นั้นกู้คืนภายหลังได้
+          โดยเมื่อกู้คืน ระบบจะ <strong>แทนที่ข้อมูลเดิมทั้งหมด</strong> ใน users, inventory, appointments และ staff_logs
+        </div>
+
+        <div class="restore-box">
+          <div class="field">
+            <label for="backupFileInput">เลือกไฟล์สำรองข้อมูล (.json)</label>
+            <input id="backupFileInput" type="file" accept="application/json,.json" />
+          </div>
+          <div class="inline-actions">
+            <button id="restoreBackupBtn" class="btn-danger" type="button">กู้คืนข้อมูลจากไฟล์</button>
+          </div>
+          <p class="muted small" style="margin-top: 12px;">
+            ก่อนกู้คืน แนะนำให้ดาวน์โหลดไฟล์สำรองปัจจุบันเก็บไว้ก่อนทุกครั้ง
+          </p>
+        </div>
+      </section>
+
       <section class="card">
         <div class="toolbar">
           <div>
             <h2>📝 ประวัติการทำรายการล่าสุด</h2>
-            <p class="muted">แสดงการเข้าสู่ระบบ เพิ่ม/แก้ไข/ลบข้อมูล และการอัปเดต stock</p>
+            <p class="muted">แสดงการเข้าสู่ระบบ เพิ่ม/แก้ไข/ลบข้อมูล อัปเดต stock และการสำรอง/กู้คืนข้อมูล</p>
           </div>
           <button id="refreshLogsBtn" class="btn-secondary" type="button">รีเฟรช</button>
         </div>
@@ -511,6 +497,7 @@
     const loginMessage = document.getElementById('loginMessage');
     const appMessage = document.getElementById('appMessage');
     const currentUserEl = document.getElementById('currentUser');
+    const backupFileInput = document.getElementById('backupFileInput');
 
     function showMessage(target, text, type = 'success') {
       target.className = `message ${type}`;
@@ -519,7 +506,7 @@
       window.clearTimeout(target._timer);
       target._timer = window.setTimeout(() => {
         target.style.display = 'none';
-      }, 3000);
+      }, 4000);
     }
 
     function hideMessage(target) {
@@ -531,19 +518,55 @@
         'Content-Type': 'application/json',
         ...(options.headers || {}),
       };
+
       if (authToken) {
         headers.Authorization = `Bearer ${authToken}`;
       }
+
       const response = await fetch(API_URL + url, { ...options, headers });
+
       let data = null;
       try {
         data = await response.json();
       } catch (_) {}
+
       if (!response.ok) {
         const message = data?.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อระบบ';
         throw new Error(message);
       }
+
       return data;
+    }
+
+    async function apiDownload(url) {
+      const headers = {};
+      if (authToken) {
+        headers.Authorization = `Bearer ${authToken}`;
+      }
+
+      const response = await fetch(API_URL + url, { headers });
+
+      if (!response.ok) {
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (_) {}
+        throw new Error(data?.message || 'ไม่สามารถดาวน์โหลดไฟล์สำรองได้');
+      }
+
+      const blob = await response.blob();
+      const disposition = response.headers.get('content-disposition') || '';
+      const match = disposition.match(/filename="?([^";]+)"?/i);
+      const filename = match ? match[1] : 'aura_clinic_backup.json';
+
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
     }
 
     function formatDateTime(value) {
@@ -575,18 +598,18 @@
       const q = document.getElementById('appointmentSearch').value.trim();
       const status = document.getElementById('appointmentStatusFilter').value;
       const date = document.getElementById('appointmentDateFilter').value;
+
       const params = new URLSearchParams();
       if (q) params.append('q', q);
       if (status) params.append('status', status);
       if (date) params.append('date', date);
+
       const query = params.toString();
       const data = await apiFetch(`/api/appointments${query ? `?${query}` : ''}`);
       appointmentCache = data;
+
       const tbody = document.getElementById('appointmentsBody');
-      tbody.innerHTML = data.length
-        ? data
-            .map(
-              (app) => `
+      tbody.innerHTML = data.length ? data.map(app => `
         <tr>
           <td>${app.customer_name}</td>
           <td>${app.phone || '-'}</td>
@@ -597,75 +620,63 @@
           <td>
             <div class="inline-actions">
               <button type="button" class="btn-warning" onclick="editAppointment(${app.id})">แก้ไข</button>
-              <button type="button" class="btn-danger" onclick="deleteAppointment(${app.id}, decodeURIComponent('${encodeURIComponent(app.customer_name || '')}'))">
-                ลบ
-              </button>
+              <button type="button" class="btn-danger" onclick="deleteAppointment(${app.id}, decodeURIComponent('${encodeURIComponent(app.customer_name || '')}'))">ลบ</button>
             </div>
           </td>
         </tr>
-      `
-            )
-            .join('')
-        : '<tr><td colspan="7" class="muted">ไม่พบข้อมูลนัดหมาย</td></tr>';
+      `).join('') : '<tr><td colspan="7" class="muted">ไม่พบข้อมูลนัดหมาย</td></tr>';
     }
 
     async function loadInventory() {
       const q = document.getElementById('inventorySearch').value.trim();
       const lowStock = document.getElementById('lowStockOnly').checked;
+
       const params = new URLSearchParams();
       if (q) params.append('q', q);
       if (lowStock) params.append('lowStock', 'true');
+
       const query = params.toString();
       const data = await apiFetch(`/api/inventory${query ? `?${query}` : ''}`);
       inventoryCache = data;
+
       const tbody = document.getElementById('inventoryBody');
-      tbody.innerHTML = data.length
-        ? data
-            .map((item) => {
-              const isLowStock = Number(item.quantity) <= Number(item.min_quantity);
-              return `
-        <tr>
-          <td>${item.item_name}</td>
-          <td>
-            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-              <input type="number" min="0" id="quick-stock-${item.id}" value="${item.quantity}" style="width: 90px;" />
-              <button type="button" class="btn-success" onclick="quickUpdateStock(${item.id})">บันทึก stock</button>
-            </div>
-          </td>
-          <td>${item.unit}</td>
-          <td>${item.min_quantity}</td>
-          <td>${isLowStock ? '<span class="status-badge status-pending">ใกล้หมด</span>' : '<span class="status-badge status-completed">ปกติ</span>'}</td>
-          <td>
-            <div class="inline-actions">
-              <button type="button" class="btn-warning" onclick="editInventory(${item.id})">แก้ไข</button>
-              <button type="button" class="btn-danger" onclick="deleteInventory(${item.id}, decodeURIComponent('${encodeURIComponent(item.item_name || '')}'))">
-                ลบ
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-            })
-            .join('')
-        : '<tr><td colspan="6" class="muted">ไม่พบข้อมูลคลังสินค้า</td></tr>';
+      tbody.innerHTML = data.length ? data.map(item => {
+        const isLowStock = Number(item.quantity) <= Number(item.min_quantity);
+
+        return `
+          <tr>
+            <td>${item.item_name}</td>
+            <td>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <input type="number" min="0" id="quick-stock-${item.id}" value="${item.quantity}" style="width:90px;" />
+                <button type="button" class="btn-success" onclick="quickUpdateStock(${item.id})">บันทึก stock</button>
+              </div>
+            </td>
+            <td>${item.unit}</td>
+            <td>${item.min_quantity}</td>
+            <td>${isLowStock ? '<span class="status-badge status-pending">ใกล้หมด</span>' : '<span class="status-badge status-completed">ปกติ</span>'}</td>
+            <td>
+              <div class="inline-actions">
+                <button type="button" class="btn-warning" onclick="editInventory(${item.id})">แก้ไข</button>
+                <button type="button" class="btn-danger" onclick="deleteInventory(${item.id}, decodeURIComponent('${encodeURIComponent(item.item_name || '')}'))">ลบ</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('') : '<tr><td colspan="6" class="muted">ไม่พบข้อมูลคลังสินค้า</td></tr>';
     }
 
     async function loadLogs() {
       const data = await apiFetch('/api/staff-logs');
       const tbody = document.getElementById('logsBody');
-      tbody.innerHTML = data.length
-        ? data
-            .map(
-              (log) => `
+
+      tbody.innerHTML = data.length ? data.map(log => `
         <tr>
           <td>${formatDateTime(log.created_at)}</td>
           <td>${log.staff_name}</td>
           <td>${log.action_text}</td>
         </tr>
-      `
-            )
-            .join('')
-        : '<tr><td colspan="3" class="muted">ยังไม่มีประวัติการทำรายการ</td></tr>';
+      `).join('') : '<tr><td colspan="3" class="muted">ยังไม่มีประวัติการทำรายการ</td></tr>';
     }
 
     function resetAppointmentForm() {
@@ -685,8 +696,9 @@
     }
 
     function editAppointment(id) {
-      const item = appointmentCache.find((row) => Number(row.id) === Number(id));
+      const item = appointmentCache.find(row => Number(row.id) === Number(id));
       if (!item) return;
+
       document.getElementById('appointmentId').value = item.id;
       document.getElementById('customerName').value = item.customer_name;
       document.getElementById('customerPhone').value = item.phone || '';
@@ -700,8 +712,9 @@
     }
 
     function editInventory(id) {
-      const item = inventoryCache.find((row) => Number(row.id) === Number(id));
+      const item = inventoryCache.find(row => Number(row.id) === Number(id));
       if (!item) return;
+
       document.getElementById('inventoryId').value = item.id;
       document.getElementById('itemName').value = item.item_name;
       document.getElementById('itemQuantity').value = item.quantity;
@@ -717,7 +730,7 @@
         const quantity = Number(document.getElementById(`quick-stock-${id}`).value || 0);
         await apiFetch(`/api/stock/${id}`, {
           method: 'PUT',
-          body: JSON.stringify({ quantity }),
+          body: JSON.stringify({ quantity })
         });
         showMessage(appMessage, 'อัปเดต stock เรียบร้อย');
         await refreshAll();
@@ -748,6 +761,49 @@
       }
     }
 
+    async function downloadBackup() {
+      try {
+        await apiDownload('/api/system/backup');
+        showMessage(appMessage, 'ดาวน์โหลดไฟล์สำรองข้อมูลเรียบร้อย');
+        await loadLogs();
+      } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+      }
+    }
+
+    async function restoreBackup() {
+      const file = backupFileInput.files[0];
+
+      if (!file) {
+        showMessage(appMessage, 'กรุณาเลือกไฟล์สำรองข้อมูลก่อน', 'error');
+        return;
+      }
+
+      const confirmed = confirm(
+        'การกู้คืนข้อมูลจะเขียนทับข้อมูลปัจจุบันทั้งหมดในระบบ\n\nต้องการดำเนินการต่อหรือไม่?'
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        const text = await file.text();
+        const backup = JSON.parse(text);
+
+        await apiFetch('/api/system/restore', {
+          method: 'POST',
+          body: JSON.stringify({ backup })
+        });
+
+        backupFileInput.value = '';
+        showMessage(appMessage, 'กู้คืนข้อมูลระบบเรียบร้อย');
+        await refreshAll();
+      } catch (error) {
+        showMessage(appMessage, error.message || 'ไม่สามารถกู้คืนข้อมูลได้', 'error');
+      }
+    }
+
     async function refreshAll() {
       await Promise.all([loadSummary(), loadAppointments(), loadInventory(), loadLogs()]);
     }
@@ -760,8 +816,9 @@
         const password = document.getElementById('password').value;
         const data = await apiFetch('/api/auth/login', {
           method: 'POST',
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ username, password })
         });
+
         authToken = data.token;
         currentUser = data.user;
         localStorage.setItem('clinicToken', authToken);
@@ -798,10 +855,12 @@
           status: document.getElementById('appointmentStatus').value,
           notes: document.getElementById('appointmentNotes').value.trim(),
         };
+
         await apiFetch(id ? `/api/appointments/${id}` : '/api/appointments', {
           method: id ? 'PUT' : 'POST',
-          body: JSON.stringify(payload),
+          body: JSON.stringify(payload)
         });
+
         showMessage(appMessage, id ? 'แก้ไขนัดหมายเรียบร้อย' : 'เพิ่มนัดหมายเรียบร้อย');
         resetAppointmentForm();
         await refreshAll();
@@ -820,10 +879,12 @@
           unit: document.getElementById('itemUnit').value.trim(),
           min_quantity: Number(document.getElementById('itemMinQuantity').value || 0),
         };
+
         await apiFetch(id ? `/api/inventory/${id}` : '/api/inventory', {
           method: id ? 'PUT' : 'POST',
-          body: JSON.stringify(payload),
+          body: JSON.stringify(payload)
         });
+
         showMessage(appMessage, id ? 'แก้ไขสินค้าเรียบร้อย' : 'เพิ่มสินค้าเรียบร้อย');
         resetInventoryForm();
         await refreshAll();
@@ -837,6 +898,8 @@
     document.getElementById('appointmentSearchBtn').addEventListener('click', loadAppointments);
     document.getElementById('inventorySearchBtn').addEventListener('click', loadInventory);
     document.getElementById('refreshLogsBtn').addEventListener('click', loadLogs);
+    document.getElementById('downloadBackupBtn').addEventListener('click', downloadBackup);
+    document.getElementById('restoreBackupBtn').addEventListener('click', restoreBackup);
 
     document.getElementById('appointmentClearBtn').addEventListener('click', () => {
       document.getElementById('appointmentSearch').value = '';
@@ -860,10 +923,12 @@
     async function boot() {
       resetAppointmentForm();
       resetInventoryForm();
+
       if (!authToken) {
         renderAppMode(false);
         return;
       }
+
       try {
         const data = await apiFetch('/api/auth/me');
         currentUser = data.user;

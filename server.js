@@ -8,10 +8,13 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SESSION_TTL_MS = 1000 * 60 * 60 * 8; // 8 ชั่วโมง
+const BACKUP_TABLES = ['users', 'inventory', 'appointments', 'staff_logs'];
+const DELETE_RESTORE_ORDER = ['staff_logs', 'appointments', 'inventory', 'users'];
+const INSERT_RESTORE_ORDER = ['users', 'inventory', 'appointments', 'staff_logs'];
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname)));
 
 const pool = mysql.createPool({
@@ -37,7 +40,57 @@ function createToken() {
 
 function normalizeDateTime(value) {
     if (!value) return null;
-    return value.replace('T', ' ');
+    return String(value).replace('T', ' ');
+}
+
+function createTimestampForFilename(date = new Date()) {
+    const pad = (value) => String(value).padStart(2, '0');
+    return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+}
+
+function normalizeRowsForBackup(rows) {
+    return JSON.parse(JSON.stringify(rows));
+}
+
+function validateBackupPayload(backup) {
+    if (!backup || typeof backup !== 'object' || Array.isArray(backup)) {
+        return 'รูปแบบไฟล์สำรองข้อมูลไม่ถูกต้อง';
+    }
+
+    if (!backup.tables || typeof backup.tables !== 'object' || Array.isArray(backup.tables)) {
+        return 'ไม่พบข้อมูลตารางในไฟล์สำรองข้อมูล';
+    }
+
+    for (const tableName of BACKUP_TABLES) {
+        if (!Array.isArray(backup.tables[tableName])) {
+            return `ไฟล์สำรองข้อมูลขาดตาราง ${tableName}`;
+        }
+    }
+
+    if (backup.tables.users.length === 0) {
+        return 'ไฟล์สำรองข้อมูลต้องมีข้อมูลผู้ใช้งานอย่างน้อย 1 รายการ';
+    }
+
+    return null;
+}
+
+async function insertRows(connection, tableName, rows) {
+    for (const row of rows) {
+        const entries = Object.entries(row);
+
+        if (!entries.length) {
+            continue;
+        }
+
+        const columns = entries.map(([column]) => `\`${column}\``).join(', ');
+        const placeholders = entries.map(() => '?').join(', ');
+        const values = entries.map(([, value]) => value);
+
+        await connection.execute(
+            `INSERT INTO \`${tableName}\` (${columns}) VALUES (${placeholders})`,
+            values
+        );
+    }
 }
 
 async function logAction(staffName, actionText) {
@@ -394,7 +447,7 @@ app.delete('/api/appointments/:id', requireAuth, async (req, res) => {
 });
 
 // =========================
-// LOGS
+// STAFF LOGS
 // =========================
 app.get('/api/staff-logs', requireAuth, async (req, res) => {
     try {
@@ -405,6 +458,94 @@ app.get('/api/staff-logs', requireAuth, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'ไม่สามารถดึงข้อมูล log ได้' });
+    }
+});
+
+// =========================
+// BACKUP / RESTORE
+// =========================
+app.get('/api/system/backup', requireAuth, async (req, res) => {
+    try {
+        const [users, inventory, appointments, staffLogs] = await Promise.all([
+            queryMany('SELECT * FROM users ORDER BY id ASC'),
+            queryMany('SELECT * FROM inventory ORDER BY id ASC'),
+            queryMany('SELECT * FROM appointments ORDER BY id ASC'),
+            queryMany('SELECT * FROM staff_logs ORDER BY id ASC'),
+        ]);
+
+        const backup = {
+            app_name: 'Aura Clinic Admin System',
+            backup_version: 1,
+            exported_at: new Date().toISOString(),
+            exported_by: req.user,
+            database: process.env.DB_NAME,
+            tables: {
+                users: normalizeRowsForBackup(users),
+                inventory: normalizeRowsForBackup(inventory),
+                appointments: normalizeRowsForBackup(appointments),
+                staff_logs: normalizeRowsForBackup(staffLogs),
+            },
+        };
+
+        const filename = `aura_clinic_backup_${createTimestampForFilename()}.json`;
+
+        await logAction(req.user.full_name, `สำรองข้อมูลระบบ (${filename})`);
+
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send(JSON.stringify(backup, null, 2));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'ไม่สามารถสำรองข้อมูลระบบได้' });
+    }
+});
+
+app.post('/api/system/restore', requireAuth, async (req, res) => {
+    const connection = await pool.getConnection();
+
+    try {
+        const { backup } = req.body;
+        const validationError = validateBackupPayload(backup);
+
+        if (validationError) {
+            connection.release();
+            return res.status(400).json({ message: validationError });
+        }
+
+        await connection.beginTransaction();
+
+        for (const tableName of DELETE_RESTORE_ORDER) {
+            await connection.execute(`DELETE FROM \`${tableName}\``);
+        }
+
+        for (const tableName of INSERT_RESTORE_ORDER) {
+            await insertRows(connection, tableName, backup.tables[tableName]);
+        }
+
+        await connection.commit();
+        connection.release();
+
+        await logAction(
+            req.user.full_name,
+            `กู้คืนข้อมูลระบบจากไฟล์สำรอง (${backup.exported_at || 'ไม่ระบุเวลา'})`
+        );
+
+        res.json({
+            message: 'กู้คืนข้อมูลระบบเรียบร้อย',
+            restored_tables: {
+                users: backup.tables.users.length,
+                inventory: backup.tables.inventory.length,
+                appointments: backup.tables.appointments.length,
+                staff_logs: backup.tables.staff_logs.length,
+            },
+        });
+    } catch (error) {
+        console.error(error);
+        try {
+            await connection.rollback();
+        } catch (_) {}
+        connection.release();
+        res.status(500).json({ message: 'ไม่สามารถกู้คืนข้อมูลระบบได้' });
     }
 });
 
