@@ -44,7 +44,8 @@ CREATE TABLE staff_logs (
 
 INSERT INTO users (username, password_hash, full_name, role)
 VALUES
-('admin', SHA2('admin123', 256), 'Clinic Admin', 'admin');
+('admin', SHA2('admin123', 256), 'Clinic Admin', 'admin'),
+('superadmin', SHA2('super123', 256), 'System Admin', 'superadmin');
 
 INSERT INTO inventory (item_name, quantity, unit, min_quantity)
 VALUES

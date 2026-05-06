@@ -2,6 +2,10 @@
 require_once __DIR__ . '/common.php';
 $user = require_auth();
 
+if ($user['role'] !== 'superadmin') {
+    json_response(['message' => 'คุณไม่มีสิทธิ์เข้าถึงส่วนนี้'], 403);
+}
+
 if (request_method() !== 'POST') {
     json_response(['message' => 'Method not allowed'], 405);
 }

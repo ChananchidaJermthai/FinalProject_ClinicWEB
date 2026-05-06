@@ -97,6 +97,7 @@
           <p class="muted">ระบบจัดการผู้ใช้บริการ คลังสินค้า การนัดหมาย การค้นหาข้อมูล และการสำรอง/กู้คืนข้อมูล</p>
         </div>
         <div class="actions">
+          <a href="system_tools.php" id="systemToolsBtn" class="btn-info hidden" style="text-decoration:none; padding:10px 14px; border-radius:10px; font-weight:600;">เครื่องมือระบบ</a>
           <div id="currentUser" class="user-badge">กำลังโหลดผู้ใช้...</div>
           <button id="logoutBtn" class="btn-secondary" type="button">ออกจากระบบ</button>
         </div>
@@ -203,50 +204,7 @@
         </div>
       </section>
 
-      <section class="card">
-        <div class="toolbar">
-          <div>
-            <h2>💾 Backup / Restore ข้อมูลระบบ</h2>
-            <p class="muted">สำรองข้อมูลระบบเป็นไฟล์ JSON และกู้คืนข้อมูลกลับเข้าระบบเมื่อเกิดปัญหา</p>
-          </div>
-          <div class="actions">
-            <button id="downloadBackupBtn" class="btn-info" type="button">ดาวน์โหลดไฟล์สำรอง</button>
-          </div>
-        </div>
 
-        <div class="help-box small">
-          <strong>คำแนะนำ:</strong>
-          ระบบนี้เป็น <strong>Manual Backup / Restore</strong> คือผู้ดูแลระบบกดสำรองข้อมูลเองเป็นไฟล์ และใช้ไฟล์นั้นกู้คืนภายหลังได้
-          โดยเมื่อกู้คืน ระบบจะ <strong>แทนที่ข้อมูลเดิมทั้งหมด</strong> ใน users, inventory, appointments และ staff_logs
-        </div>
-
-        <div class="restore-box">
-          <div class="field">
-            <label for="backupFileInput">เลือกไฟล์สำรองข้อมูล (.json)</label>
-            <input id="backupFileInput" type="file" accept="application/json,.json" />
-          </div>
-          <div class="inline-actions">
-            <button id="restoreBackupBtn" class="btn-danger" type="button">กู้คืนข้อมูลจากไฟล์</button>
-          </div>
-          <p class="muted small" style="margin-top: 12px;">ก่อนกู้คืน แนะนำให้ดาวน์โหลดไฟล์สำรองปัจจุบันเก็บไว้ก่อนทุกครั้ง</p>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="toolbar">
-          <div>
-            <h2>📝 ประวัติการทำรายการล่าสุด</h2>
-            <p class="muted">แสดงการเข้าสู่ระบบ เพิ่ม/แก้ไข/ลบข้อมูล อัปเดต stock และการสำรอง/กู้คืนข้อมูล</p>
-          </div>
-          <button id="refreshLogsBtn" class="btn-secondary" type="button">รีเฟรช</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>เวลา</th><th>ผู้ใช้งาน</th><th>รายการ</th></tr></thead>
-            <tbody id="logsBody"></tbody>
-          </table>
-        </div>
-      </section>
     </div>
   </main>
 
@@ -273,7 +231,7 @@
     const loginMessage = document.getElementById('loginMessage');
     const appMessage = document.getElementById('appMessage');
     const currentUserEl = document.getElementById('currentUser');
-    const backupFileInput = document.getElementById('backupFileInput');
+    const systemToolsBtn = document.getElementById('systemToolsBtn');
 
     function showMessage(target, text, type = 'success') {
       target.className = `message ${type}`;
@@ -579,6 +537,7 @@
         });
         currentUser = data.user;
         currentUserEl.textContent = `${currentUser.full_name} (${currentUser.role})`;
+        if (currentUser.role === 'superadmin') systemToolsBtn.classList.remove('hidden');
         renderAppMode(true);
         showMessage(appMessage, 'เข้าสู่ระบบสำเร็จ');
         await refreshAll();
@@ -591,6 +550,7 @@
       try { await apiFetch(API.logout, { method: 'POST' }); } catch (_) {}
       currentUser = null;
       renderAppMode(false);
+      systemToolsBtn.classList.add('hidden');
       document.getElementById('loginForm').reset();
       showMessage(loginMessage, 'ออกจากระบบเรียบร้อย');
     });
@@ -682,6 +642,7 @@
         const data = await apiFetch(API.me);
         currentUser = data.user;
         currentUserEl.textContent = `${currentUser.full_name} (${currentUser.role})`;
+        if (currentUser.role === 'superadmin') systemToolsBtn.classList.remove('hidden');
         renderAppMode(true);
         await refreshAll();
       } catch (_) {
