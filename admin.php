@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aura Clinic Admin System</title>
+  <style>
+    :root {
+      --pink: #e875b8;
+      --pink-dark: #d25a9e;
+      --bg: #f7f7fb;
+      --text: #222;
+      --muted: #666;
+      --border: #e5e7eb;
+      --danger: #dc2626;
+      --success: #0f9d58;
+      --warning: #d97706;
+      --info: #2563eb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: var(--text); background: var(--bg); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .card { background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 20px; margin-bottom: 20px; }
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .login-card { width: 100%; max-width: 420px; }
+    h1,h2,h3 { margin-top: 0; }
+    .muted { color: var(--muted); }
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    label { font-weight: 600; }
+    input,select,textarea,button { font: inherit; }
+    input,select,textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: #fff; }
+    textarea { min-height: 90px; resize: vertical; }
+    button { border: none; border-radius: 10px; padding: 10px 14px; cursor: pointer; transition: 0.2s ease; }
+    button:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--pink); color: white; }
+    .btn-primary:hover { background: var(--pink-dark); }
+    .btn-secondary { background: #eef2ff; color: #333; }
+    .btn-danger { background: #fee2e2; color: var(--danger); }
+    .btn-success { background: #dcfce7; color: #166534; }
+    .btn-warning { background: #fff7ed; color: var(--warning); }
+    .btn-info { background: #dbeafe; color: var(--info); }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .toolbar .actions, .toolbar .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    table { width: 100%; border-collapse: collapse; overflow: hidden; }
+    th, td { border-bottom: 1px solid var(--border); padding: 12px 10px; text-align: left; vertical-align: top; }
+    th { background: #fce7f3; color: #7a2154; }
+    .table-wrap { overflow-x: auto; }
+    .status-badge { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; text-transform: capitalize; }
+    .status-pending { background: #fff7ed; color: var(--warning); }
+    .status-confirmed { background: #ecfeff; color: #0f766e; }
+    .status-completed { background: #ecfdf5; color: var(--success); }
+    .status-cancelled { background: #fef2f2; color: var(--danger); }
+    .summary-box { background: linear-gradient(135deg, #fff1f8, #ffffff); border: 1px solid #f5d0e3; border-radius: 16px; padding: 18px; }
+    .summary-number { font-size: 28px; font-weight: 800; margin-top: 8px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .user-badge { padding: 10px 14px; border-radius: 999px; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+    .message { padding: 12px 14px; border-radius: 10px; margin-bottom: 14px; display: none; }
+    .message.error { display: block; background: #fef2f2; color: #991b1b; }
+    .message.success { display: block; background: #ecfdf5; color: #166534; }
+    .inline-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .help-box { padding: 14px 16px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; margin-bottom: 16px; line-height: 1.6; }
+    .restore-box { border: 1px dashed #cbd5e1; border-radius: 12px; padding: 16px; background: #fcfcff; }
+    .hidden { display: none !important; }
+    .small { font-size: 13px; }
+    @media (max-width: 900px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <section id="loginSection" class="login-wrap">
+    <div class="card login-card">
+      <h1>🔐 Aura Clinic Admin Login</h1>
+      <p class="muted">เข้าสู่ระบบเพื่อจัดการคลังสินค้า รายการนัดหมาย และข้อมูลลูกค้า</p>
+      <div id="loginMessage" class="message"></div>
+      <form id="loginForm">
+        <div class="field">
+          <label for="username">ชื่อผู้ใช้</label>
+          <input id="username" name="username" placeholder="เช่น admin" required />
+        </div>
+        <div class="field">
+          <label for="password">รหัสผ่าน</label>
+          <input id="password" name="password" type="password" placeholder="กรอกรหัสผ่าน" required />
+        </div>
+        <button class="btn-primary" type="submit">เข้าสู่ระบบ</button>
+      </form>
+      <p class="muted small" style="margin-top: 12px;">ค่าเริ่มต้นสำหรับทดสอบ: admin / admin123</p>
+    </div>
+  </section>
+
+  <main id="appSection" class="hidden">
+    <div class="container">
+      <div class="topbar">
+        <div>
+          <h1>🏥 Aura Clinic Admin System</h1>
+          <p class="muted">ระบบจัดการผู้ใช้บริการ คลังสินค้า การนัดหมาย การค้นหาข้อมูล และการสำรอง/กู้คืนข้อมูล</p>
+        </div>
+        <div class="actions">
+          <div id="currentUser" class="user-badge">กำลังโหลดผู้ใช้...</div>
+          <button id="logoutBtn" class="btn-secondary" type="button">ออกจากระบบ</button>
+        </div>
+      </div>
+
+      <div id="appMessage" class="message"></div>
+
+      <section class="grid grid-4" id="summaryGrid">
+        <div class="summary-box"><div class="muted">นัดหมายทั้งหมด</div><div class="summary-number" id="sumAppointments">0</div></div>
+        <div class="summary-box"><div class="muted">นัดหมายรอดำเนินการ</div><div class="summary-number" id="sumPending">0</div></div>
+        <div class="summary-box"><div class="muted">รายการคลังสินค้า</div><div class="summary-number" id="sumInventory">0</div></div>
+        <div class="summary-box"><div class="muted">สินค้าใกล้หมด</div><div class="summary-number" id="sumLowStock">0</div></div>
+      </section>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <h2>📅 ระบบจัดการนัดหมาย</h2>
+            <p class="muted">เก็บชื่อผู้ใช้บริการ ใช้บริการอะไร วันเวลา และสถานะการนัดหมาย</p>
+          </div>
+          <div class="filters">
+            <input id="appointmentSearch" placeholder="ค้นหาชื่อลูกค้า / บริการ / เบอร์โทร" />
+            <select id="appointmentStatusFilter">
+              <option value="">ทุกสถานะ</option>
+              <option value="pending">pending</option>
+              <option value="confirmed">confirmed</option>
+              <option value="completed">completed</option>
+              <option value="cancelled">cancelled</option>
+            </select>
+            <input id="appointmentDateFilter" type="date" />
+            <button class="btn-secondary" id="appointmentSearchBtn" type="button">ค้นหา</button>
+            <button class="btn-secondary" id="appointmentClearBtn" type="button">ล้าง</button>
+          </div>
+        </div>
+
+        <form id="appointmentForm">
+          <input type="hidden" id="appointmentId" />
+          <div class="grid grid-2">
+            <div class="field"><label for="customerName">ชื่อลูกค้า</label><input id="customerName" required /></div>
+            <div class="field"><label for="customerPhone">เบอร์โทร</label><input id="customerPhone" /></div>
+            <div class="field"><label for="serviceName">บริการที่ใช้</label><input id="serviceName" placeholder="เช่น Facial, Botox, IV Drip" required /></div>
+            <div class="field"><label for="appointmentDate">วันและเวลา</label><input id="appointmentDate" type="datetime-local" required /></div>
+            <div class="field"><label for="appointmentStatus">สถานะ</label>
+              <select id="appointmentStatus">
+                <option value="pending">pending</option>
+                <option value="confirmed">confirmed</option>
+                <option value="completed">completed</option>
+                <option value="cancelled">cancelled</option>
+              </select>
+            </div>
+            <div class="field"><label for="appointmentNotes">หมายเหตุ</label><textarea id="appointmentNotes" placeholder="รายละเอียดเพิ่มเติม"></textarea></div>
+          </div>
+          <div class="inline-actions">
+            <button class="btn-primary" type="submit" id="appointmentSubmitBtn">เพิ่มนัดหมาย</button>
+            <button class="btn-secondary hidden" type="button" id="appointmentCancelEditBtn">ยกเลิกการแก้ไข</button>
+          </div>
+        </form>
+
+        <div class="table-wrap" style="margin-top:16px;">
+          <table>
+            <thead>
+              <tr><th>ชื่อลูกค้า</th><th>เบอร์โทร</th><th>บริการ</th><th>วันเวลา</th><th>สถานะ</th><th>หมายเหตุ</th><th>จัดการ</th></tr>
+            </thead>
+            <tbody id="appointmentsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <h2>📦 ระบบจัดการคลังสินค้า</h2>
+            <p class="muted">เพิ่ม แก้ไข ลบ และค้นหารายการเวชภัณฑ์ พร้อมแก้จำนวน stock ได้</p>
+          </div>
+          <div class="filters">
+            <input id="inventorySearch" placeholder="ค้นหาชื่อรายการ / หน่วย" />
+            <label class="small"><input id="lowStockOnly" type="checkbox" /> แสดงเฉพาะใกล้หมด</label>
+            <button class="btn-secondary" id="inventorySearchBtn" type="button">ค้นหา</button>
+            <button class="btn-secondary" id="inventoryClearBtn" type="button">ล้าง</button>
+          </div>
+        </div>
+
+        <form id="inventoryForm">
+          <input type="hidden" id="inventoryId" />
+          <div class="grid grid-2">
+            <div class="field"><label for="itemName">ชื่อรายการ</label><input id="itemName" required /></div>
+            <div class="field"><label for="itemUnit">หน่วย</label><input id="itemUnit" placeholder="เช่น ชิ้น / กล่อง / ขวด" required /></div>
+            <div class="field"><label for="itemQuantity">จำนวนคงเหลือ</label><input id="itemQuantity" type="number" min="0" required /></div>
+            <div class="field"><label for="itemMinQuantity">จำนวนขั้นต่ำแจ้งเตือน</label><input id="itemMinQuantity" type="number" min="0" value="0" /></div>
+          </div>
+          <div class="inline-actions">
+            <button class="btn-primary" type="submit" id="inventorySubmitBtn">เพิ่มสินค้า</button>
+            <button class="btn-secondary hidden" type="button" id="inventoryCancelEditBtn">ยกเลิกการแก้ไข</button>
+          </div>
+        </form>
+
+        <div class="table-wrap" style="margin-top:16px;">
+          <table>
+            <thead>
+              <tr><th>รายการ</th><th>คงเหลือ</th><th>หน่วย</th><th>ขั้นต่ำ</th><th>สถานะ stock</th><th>จัดการ</th></tr>
+            </thead>
+            <tbody id="inventoryBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <h2>💾 Backup / Restore ข้อมูลระบบ</h2>
+            <p class="muted">สำรองข้อมูลระบบเป็นไฟล์ JSON และกู้คืนข้อมูลกลับเข้าระบบเมื่อเกิดปัญหา</p>
+          </div>
+          <div class="actions">
+            <button id="downloadBackupBtn" class="btn-info" type="button">ดาวน์โหลดไฟล์สำรอง</button>
+          </div>
+        </div>
+
+        <div class="help-box small">
+          <strong>คำแนะนำ:</strong>
+          ระบบนี้เป็น <strong>Manual Backup / Restore</strong> คือผู้ดูแลระบบกดสำรองข้อมูลเองเป็นไฟล์ และใช้ไฟล์นั้นกู้คืนภายหลังได้
+          โดยเมื่อกู้คืน ระบบจะ <strong>แทนที่ข้อมูลเดิมทั้งหมด</strong> ใน users, inventory, appointments และ staff_logs
+        </div>
+
+        <div class="restore-box">
+          <div class="field">
+            <label for="backupFileInput">เลือกไฟล์สำรองข้อมูล (.json)</label>
+            <input id="backupFileInput" type="file" accept="application/json,.json" />
+          </div>
+          <div class="inline-actions">
+            <button id="restoreBackupBtn" class="btn-danger" type="button">กู้คืนข้อมูลจากไฟล์</button>
+          </div>
+          <p class="muted small" style="margin-top: 12px;">ก่อนกู้คืน แนะนำให้ดาวน์โหลดไฟล์สำรองปัจจุบันเก็บไว้ก่อนทุกครั้ง</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <h2>📝 ประวัติการทำรายการล่าสุด</h2>
+            <p class="muted">แสดงการเข้าสู่ระบบ เพิ่ม/แก้ไข/ลบข้อมูล อัปเดต stock และการสำรอง/กู้คืนข้อมูล</p>
+          </div>
+          <button id="refreshLogsBtn" class="btn-secondary" type="button">รีเฟรช</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>เวลา</th><th>ผู้ใช้งาน</th><th>รายการ</th></tr></thead>
+            <tbody id="logsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const API = {
+      login: 'api/auth_login.php',
+      me: 'api/auth_me.php',
+      logout: 'api/auth_logout.php',
+      summary: 'api/dashboard_summary.php',
+      inventory: 'api/inventory.php',
+      stockUpdate: 'api/stock_update.php',
+      appointments: 'api/appointments.php',
+      logs: 'api/staff_logs.php',
+      backup: 'api/system_backup.php',
+      restore: 'api/system_restore.php'
+    };
+
+    let currentUser = null;
+    let appointmentCache = [];
+    let inventoryCache = [];
+
+    const loginSection = document.getElementById('loginSection');
+    const appSection = document.getElementById('appSection');
+    const loginMessage = document.getElementById('loginMessage');
+    const appMessage = document.getElementById('appMessage');
+    const currentUserEl = document.getElementById('currentUser');
+    const backupFileInput = document.getElementById('backupFileInput');
+
+    function showMessage(target, text, type = 'success') {
+      target.className = `message ${type}`;
+      target.textContent = text;
+      target.style.display = 'block';
+      clearTimeout(target._timer);
+      target._timer = setTimeout(() => {
+        target.style.display = 'none';
+      }, 4000);
+    }
+
+    function hideMessage(target) {
+      target.style.display = 'none';
+    }
+
+    async function apiFetch(url, options = {}) {
+      const response = await fetch(url, {
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(options.headers || {})
+        },
+        ...options
+      });
+
+      let data = null;
+      try {
+        data = await response.json();
+      } catch (_) {}
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อระบบ');
+      }
+
+      return data;
+    }
+
+    async function apiDownload(url) {
+      const response = await fetch(url, { credentials: 'same-origin' });
+
+      if (!response.ok) {
+        let data = null;
+        try { data = await response.json(); } catch (_) {}
+        throw new Error(data?.message || 'ไม่สามารถดาวน์โหลดไฟล์สำรองได้');
+      }
+
+      const blob = await response.blob();
+      const disposition = response.headers.get('content-disposition') || '';
+      const match = disposition.match(/filename="?([^";]+)"?/i);
+      const filename = match ? match[1] : 'aura_clinic_backup.json';
+
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(downloadUrl);
+    }
+
+    function formatDateTime(value) {
+      if (!value) return '-';
+      return new Date(value).toLocaleString('th-TH');
+    }
+
+    function formatDateTimeLocal(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      const tzOffset = date.getTimezoneOffset() * 60000;
+      return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
+    }
+
+    function renderAppMode(isLoggedIn) {
+      loginSection.classList.toggle('hidden', isLoggedIn);
+      appSection.classList.toggle('hidden', !isLoggedIn);
+    }
+
+    async function loadSummary() {
+      const data = await apiFetch(API.summary);
+      document.getElementById('sumAppointments').textContent = data.totalAppointments;
+      document.getElementById('sumPending').textContent = data.pendingAppointments;
+      document.getElementById('sumInventory').textContent = data.totalInventoryItems;
+      document.getElementById('sumLowStock').textContent = data.lowStockItems;
+    }
+
+    async function loadAppointments() {
+      const q = document.getElementById('appointmentSearch').value.trim();
+      const status = document.getElementById('appointmentStatusFilter').value;
+      const date = document.getElementById('appointmentDateFilter').value;
+
+      const params = new URLSearchParams();
+      if (q) params.append('q', q);
+      if (status) params.append('status', status);
+      if (date) params.append('date', date);
+
+      const data = await apiFetch(`${API.appointments}?${params.toString()}`);
+      appointmentCache = data;
+
+      const tbody = document.getElementById('appointmentsBody');
+      tbody.innerHTML = data.length ? data.map(app => `
+        <tr>
+          <td>${app.customer_name}</td>
+          <td>${app.phone || '-'}</td>
+          <td>${app.service_name}</td>
+          <td>${formatDateTime(app.app_date)}</td>
+          <td><span class="status-badge status-${app.status}">${app.status}</span></td>
+          <td>${app.notes || '-'}</td>
+          <td>
+            <div class="inline-actions">
+              <button type="button" class="btn-warning" onclick="editAppointment(${app.id})">แก้ไข</button>
+              <button type="button" class="btn-danger" onclick="deleteAppointment(${app.id}, decodeURIComponent('${encodeURIComponent(app.customer_name || '')}'))">ลบ</button>
+            </div>
+          </td>
+        </tr>
+      `).join('') : '<tr><td colspan="7" class="muted">ไม่พบข้อมูลนัดหมาย</td></tr>';
+    }
+
+    async function loadInventory() {
+      const q = document.getElementById('inventorySearch').value.trim();
+      const lowStock = document.getElementById('lowStockOnly').checked;
+
+      const params = new URLSearchParams();
+      if (q) params.append('q', q);
+      if (lowStock) params.append('lowStock', 'true');
+
+      const data = await apiFetch(`${API.inventory}?${params.toString()}`);
+      inventoryCache = data;
+
+      const tbody = document.getElementById('inventoryBody');
+      tbody.innerHTML = data.length ? data.map(item => {
+        const isLowStock = Number(item.quantity) <= Number(item.min_quantity);
+        return `
+          <tr>
+            <td>${item.item_name}</td>
+            <td>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <input type="number" min="0" id="quick-stock-${item.id}" value="${item.quantity}" style="width:90px;" />
+                <button type="button" class="btn-success" onclick="quickUpdateStock(${item.id})">บันทึก stock</button>
+              </div>
+            </td>
+            <td>${item.unit}</td>
+            <td>${item.min_quantity}</td>
+            <td>${isLowStock ? '<span class="status-badge status-pending">ใกล้หมด</span>' : '<span class="status-badge status-completed">ปกติ</span>'}</td>
+            <td>
+              <div class="inline-actions">
+                <button type="button" class="btn-warning" onclick="editInventory(${item.id})">แก้ไข</button>
+                <button type="button" class="btn-danger" onclick="deleteInventory(${item.id}, decodeURIComponent('${encodeURIComponent(item.item_name || '')}'))">ลบ</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('') : '<tr><td colspan="6" class="muted">ไม่พบข้อมูลคลังสินค้า</td></tr>';
+    }
+
+    async function loadLogs() {
+      const data = await apiFetch(API.logs);
+      const tbody = document.getElementById('logsBody');
+      tbody.innerHTML = data.length ? data.map(log => `
+        <tr>
+          <td>${formatDateTime(log.created_at)}</td>
+          <td>${log.staff_name}</td>
+          <td>${log.action_text}</td>
+        </tr>
+      `).join('') : '<tr><td colspan="3" class="muted">ยังไม่มีประวัติการทำรายการ</td></tr>';
+    }
+
+    function resetAppointmentForm() {
+      document.getElementById('appointmentForm').reset();
+      document.getElementById('appointmentId').value = '';
+      document.getElementById('appointmentSubmitBtn').textContent = 'เพิ่มนัดหมาย';
+      document.getElementById('appointmentCancelEditBtn').classList.add('hidden');
+      document.getElementById('appointmentStatus').value = 'pending';
+    }
+
+    function resetInventoryForm() {
+      document.getElementById('inventoryForm').reset();
+      document.getElementById('inventoryId').value = '';
+      document.getElementById('inventorySubmitBtn').textContent = 'เพิ่มสินค้า';
+      document.getElementById('inventoryCancelEditBtn').classList.add('hidden');
+      document.getElementById('itemMinQuantity').value = 0;
+    }
+
+    function editAppointment(id) {
+      const item = appointmentCache.find(row => Number(row.id) === Number(id));
+      if (!item) return;
+      document.getElementById('appointmentId').value = item.id;
+      document.getElementById('customerName').value = item.customer_name;
+      document.getElementById('customerPhone').value = item.phone || '';
+      document.getElementById('serviceName').value = item.service_name;
+      document.getElementById('appointmentDate').value = formatDateTimeLocal(item.app_date);
+      document.getElementById('appointmentStatus').value = item.status;
+      document.getElementById('appointmentNotes').value = item.notes || '';
+      document.getElementById('appointmentSubmitBtn').textContent = 'บันทึกการแก้ไข';
+      document.getElementById('appointmentCancelEditBtn').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function editInventory(id) {
+      const item = inventoryCache.find(row => Number(row.id) === Number(id));
+      if (!item) return;
+      document.getElementById('inventoryId').value = item.id;
+      document.getElementById('itemName').value = item.item_name;
+      document.getElementById('itemQuantity').value = item.quantity;
+      document.getElementById('itemUnit').value = item.unit;
+      document.getElementById('itemMinQuantity').value = item.min_quantity;
+      document.getElementById('inventorySubmitBtn').textContent = 'บันทึกการแก้ไข';
+      document.getElementById('inventoryCancelEditBtn').classList.remove('hidden');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    async function quickUpdateStock(id) {
+      try {
+        const quantity = Number(document.getElementById(`quick-stock-${id}`).value || 0);
+        await apiFetch(API.stockUpdate, {
+          method: 'PUT',
+          body: JSON.stringify({ id, quantity })
+        });
+        showMessage(appMessage, 'อัปเดต stock เรียบร้อย');
+        await refreshAll();
+      } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+      }
+    }
+
+    async function deleteAppointment(id, customerName) {
+      if (!confirm(`ยืนยันการลบนัดหมายของ ${customerName} ?`)) return;
+      try {
+        await apiFetch(API.appointments, {
+          method: 'DELETE',
+          body: JSON.stringify({ id })
+        });
+        showMessage(appMessage, 'ลบนัดหมายเรียบร้อย');
+        await refreshAll();
+      } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+      }
+    }
+
+    async function deleteInventory(id, itemName) {
+      if (!confirm(`ยืนยันการลบสินค้า ${itemName} ?`)) return;
+      try {
+        await apiFetch(API.inventory, {
+          method: 'DELETE',
+          body: JSON.stringify({ id })
+        });
+        showMessage(appMessage, 'ลบข้อมูลสินค้าเรียบร้อย');
+        await refreshAll();
+      } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+      }
+    }
+
+    async function downloadBackup() {
+      try {
+        await apiDownload(API.backup);
+        showMessage(appMessage, 'ดาวน์โหลดไฟล์สำรองข้อมูลเรียบร้อย');
+        await loadLogs();
+      } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+      }
+    }
+
+    async function restoreBackup() {
+      const file = backupFileInput.files[0];
+      if (!file) {
+        showMessage(appMessage, 'กรุณาเลือกไฟล์สำรองข้อมูลก่อน', 'error');
+        return;
+      }
+
+      if (!confirm('การกู้คืนข้อมูลจะเขียนทับข้อมูลปัจจุบันทั้งหมดในระบบ\n\nต้องการดำเนินการต่อหรือไม่?')) {
+        return;
+      }
+
+      try {
+        const text = await file.text();
+        const backup = JSON.parse(text);
+        await apiFetch(API.restore, {
+          method: 'POST',
+          body: JSON.stringify({ backup })
+        });
+        backupFileInput.value = '';
+        showMessage(appMessage, 'กู้คืนข้อมูลระบบเรียบร้อย');
+        await refreshAll();
+      } catch (error) {
+        showMessage(appMessage, error.message || 'ไม่สามารถกู้คืนข้อมูลได้', 'error');
+      }
+    }
+
+    async function refreshAll() {
+      await Promise.all([loadSummary(), loadAppointments(), loadInventory(), loadLogs()]);
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      hideMessage(loginMessage);
+      try {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const data = await apiFetch(API.login, {
+          method: 'POST',
+          body: JSON.stringify({ username, password })
+        });
+        currentUser = data.user;
+        currentUserEl.textContent = `${currentUser.full_name} (${currentUser.role})`;
+        renderAppMode(true);
+        showMessage(appMessage, 'เข้าสู่ระบบสำเร็จ');
+        await refreshAll();
+      } catch (error) {
+        showMessage(loginMessage, error.message, 'error');
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try { await apiFetch(API.logout, { method: 'POST' }); } catch (_) {}
+      currentUser = null;
+      renderAppMode(false);
+      document.getElementById('loginForm').reset();
+      showMessage(loginMessage, 'ออกจากระบบเรียบร้อย');
+    });
+
+    document.getElementById('appointmentForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      try {
+        const id = Number(document.getElementById('appointmentId').value || 0);
+        const payload = {
+          id,
+          customer_name: document.getElementById('customerName').value.trim(),
+          phone: document.getElementById('customerPhone').value.trim(),
+          service_name: document.getElementById('serviceName').value.trim(),
+          app_date: document.getElementById('appointmentDate').value,
+          status: document.getElementById('appointmentStatus').value,
+          notes: document.getElementById('appointmentNotes').value.trim(),
+        };
+
+        await apiFetch(API.appointments, {
+          method: id ? 'PUT' : 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        showMessage(appMessage, id ? 'แก้ไขนัดหมายเรียบร้อย' : 'เพิ่มนัดหมายเรียบร้อย');
+        resetAppointmentForm();
+        await refreshAll();
+      } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+      }
+    });
+
+    document.getElementById('inventoryForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      try {
+        const id = Number(document.getElementById('inventoryId').value || 0);
+        const payload = {
+          id,
+          item_name: document.getElementById('itemName').value.trim(),
+          quantity: Number(document.getElementById('itemQuantity').value || 0),
+          unit: document.getElementById('itemUnit').value.trim(),
+          min_quantity: Number(document.getElementById('itemMinQuantity').value || 0),
+        };
+
+        await apiFetch(API.inventory, {
+          method: id ? 'PUT' : 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        showMessage(appMessage, id ? 'แก้ไขสินค้าเรียบร้อย' : 'เพิ่มสินค้าเรียบร้อย');
+        resetInventoryForm();
+        await refreshAll();
+      } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+      }
+    });
+
+    document.getElementById('appointmentCancelEditBtn').addEventListener('click', resetAppointmentForm);
+    document.getElementById('inventoryCancelEditBtn').addEventListener('click', resetInventoryForm);
+    document.getElementById('appointmentSearchBtn').addEventListener('click', loadAppointments);
+    document.getElementById('inventorySearchBtn').addEventListener('click', loadInventory);
+    document.getElementById('refreshLogsBtn').addEventListener('click', loadLogs);
+    document.getElementById('downloadBackupBtn').addEventListener('click', downloadBackup);
+    document.getElementById('restoreBackupBtn').addEventListener('click', restoreBackup);
+
+    document.getElementById('appointmentClearBtn').addEventListener('click', () => {
+      document.getElementById('appointmentSearch').value = '';
+      document.getElementById('appointmentStatusFilter').value = '';
+      document.getElementById('appointmentDateFilter').value = '';
+      loadAppointments();
+    });
+
+    document.getElementById('inventoryClearBtn').addEventListener('click', () => {
+      document.getElementById('inventorySearch').value = '';
+      document.getElementById('lowStockOnly').checked = false;
+      loadInventory();
+    });
+
+    document.getElementById('appointmentSearch').addEventListener('input', loadAppointments);
+    document.getElementById('appointmentStatusFilter').addEventListener('change', loadAppointments);
+    document.getElementById('appointmentDateFilter').addEventListener('change', loadAppointments);
+    document.getElementById('inventorySearch').addEventListener('input', loadInventory);
+    document.getElementById('lowStockOnly').addEventListener('change', loadInventory);
+
+    async function boot() {
+      resetAppointmentForm();
+      resetInventoryForm();
+
+      try {
+        const data = await apiFetch(API.me);
+        currentUser = data.user;
+        currentUserEl.textContent = `${currentUser.full_name} (${currentUser.role})`;
+        renderAppMode(true);
+        await refreshAll();
+      } catch (_) {
+        renderAppMode(false);
+      }
+    }
+
+    boot();
+
+    window.editAppointment = editAppointment;
+    window.deleteAppointment = deleteAppointment;
+    window.editInventory = editInventory;
+    window.deleteInventory = deleteInventory;
+    window.quickUpdateStock = quickUpdateStock;
+  </script>
+</body>
+</html>

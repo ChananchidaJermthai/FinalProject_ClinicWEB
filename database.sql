@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS aura_clinic CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE aura_clinic;
-
 DROP TABLE IF EXISTS staff_logs;
 DROP TABLE IF EXISTS appointments;
 DROP TABLE IF EXISTS inventory;
