@@ -11,7 +11,14 @@ if (request_method() !== 'POST') {
 }
 
 $input = get_json_input();
-$backup = $input['backup'] ?? null;
+if (isset($input['encrypted_backup'])) {
+    $backup = decrypt_backup($input['encrypted_backup']);
+    if ($backup === null) {
+        json_response(['message' => 'รหัสผ่านหรือรูปแบบไฟล์เข้ารหัสไม่ถูกต้อง ไม่สามารถกู้คืนได้'], 400);
+    }
+} else {
+    $backup = $input['backup'] ?? null;
+}
 $validationError = validate_backup_payload($backup);
 
 if ($validationError !== null) {
@@ -35,7 +42,9 @@ try {
 
     log_action(
         $user['full_name'],
-        'กู้คืนข้อมูลระบบจากไฟล์สำรอง (' . ($backup['exported_at'] ?? 'ไม่ระบุเวลา') . ')'
+        $user['role'],
+        'กู้คืนข้อมูลระบบ (จากไฟล์เข้ารหัส)',
+        null
     );
 
     json_response([

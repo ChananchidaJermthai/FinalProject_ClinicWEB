@@ -4,6 +4,14 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../config.php';
 
+set_exception_handler(function ($e) {
+    http_response_code(500);
+    echo json_encode([
+        'message' => 'System Error: ' . $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+});
+
 function get_db(): PDO {
     static $pdo = null;
     if ($pdo === null) {
@@ -78,9 +86,9 @@ function execute_query(string $sql, array $params = []): bool {
     return $stmt->execute($params);
 }
 
-function log_action(string $staffName, string $actionText): void {
-    $stmt = get_db()->prepare('INSERT INTO staff_logs (staff_name, action_text) VALUES (?, ?)');
-    $stmt->execute([$staffName, $actionText]);
+function log_action(string $staffName, string $adminRole, string $actionText, $keyResultId = null): void {
+    $stmt = get_db()->prepare('INSERT INTO staff_logs (staff_name, admin_role, action_text, key_result_id) VALUES (?, ?, ?, ?)');
+    $stmt->execute([$staffName, $adminRole, $actionText, $keyResultId]);
 }
 
 function validate_backup_payload($backup): ?string {
@@ -120,4 +128,21 @@ function insert_rows(PDO $pdo, string $tableName, array $rows): void {
         $stmt = $pdo->prepare($sql);
         $stmt->execute(array_values($row));
     }
+}
+
+function encrypt_backup(array $data): string {
+    $json = json_encode($data, JSON_UNESCAPED_UNICODE);
+    // ใช้รหัสลับในการเข้ารหัส AES-256
+    $key = hash('sha256', 'AuraClinicSecretBackupKey_2026', true);
+    $iv = str_repeat('0', 16);
+    return base64_encode(openssl_encrypt($json, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv));
+}
+
+function decrypt_backup(string $encrypted): ?array {
+    $key = hash('sha256', 'AuraClinicSecretBackupKey_2026', true);
+    $iv = str_repeat('0', 16);
+    $json = openssl_decrypt(base64_decode($encrypted), 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+    if (!$json) return null;
+    $data = json_decode($json, true);
+    return is_array($data) ? $data : null;
 }

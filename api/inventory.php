@@ -41,7 +41,7 @@ if ($method === 'POST') {
     );
 
     $id = (int)get_db()->lastInsertId();
-    log_action($user['full_name'], 'เพิ่มสินค้าใหม่: ' . $itemName);
+    log_action($user['full_name'], $user['role'], 'เพิ่มข้อมูลสินค้า', $id);
     raw_json_response(query_one('SELECT * FROM inventory WHERE id = ?', [$id]), 201);
 }
 
@@ -62,7 +62,7 @@ if ($method === 'PUT') {
         [$itemName, $quantity, $unit, $minQuantity, $id]
     );
 
-    log_action($user['full_name'], 'แก้ไขสินค้า ID ' . $id . ': ' . $itemName);
+    log_action($user['full_name'], $user['role'], 'แก้ไขข้อมูลสินค้า', $id);
     raw_json_response(query_one('SELECT * FROM inventory WHERE id = ?', [$id]));
 }
 
@@ -80,7 +80,7 @@ if ($method === 'DELETE') {
     }
 
     execute_query('DELETE FROM inventory WHERE id = ?', [$id]);
-    log_action($user['full_name'], 'ลบสินค้า: ' . $item['item_name']);
+    log_action($user['full_name'], $user['role'], 'ลบข้อมูลสินค้า', $id);
     json_response(['message' => 'ลบข้อมูลสินค้าเรียบร้อย']);
 }
 

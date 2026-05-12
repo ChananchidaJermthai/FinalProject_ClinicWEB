@@ -69,7 +69,8 @@
   </style>
 </head>
 <body>
-  <section id="loginSection" class="login-wrap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <section id="loginSection" class="login-wrap hidden">
     <div class="card login-card">
       <h1>🔐 Aura Clinic Admin Login</h1>
       <p class="muted">เข้าสู่ระบบเพื่อจัดการคลังสินค้า รายการนัดหมาย และข้อมูลลูกค้า</p>
@@ -79,11 +80,19 @@
           <label for="username">ชื่อผู้ใช้</label>
           <input id="username" name="username" placeholder="เช่น admin" required />
         </div>
-        <div class="field">
+        <div class="field" id="passwordField">
           <label for="password">รหัสผ่าน</label>
           <input id="password" name="password" type="password" placeholder="กรอกรหัสผ่าน" required />
         </div>
-        <button class="btn-primary" type="submit">เข้าสู่ระบบ</button>
+        <div class="field hidden" id="otpField">
+          <label for="otp">รหัส OTP (ตรวจสอบจาก Log หรือ Console)</label>
+          <div style="display:flex; gap: 8px;">
+            <input id="otp" name="otp" type="text" placeholder="กรอก OTP 6 หลัก" style="flex:1;" />
+            <button class="btn-secondary" type="button" id="resendOtpBtn" disabled>ส่งใหม่อีกครั้ง</button>
+          </div>
+        </div>
+        <button class="btn-primary" type="submit" id="loginSubmitBtn">เข้าสู่ระบบ</button>
+        <button class="btn-secondary hidden" type="button" id="loginBackBtn" style="margin-top: 8px;">กลับ</button>
       </form>
       <p class="muted small" style="margin-top: 12px;">ค่าเริ่มต้นสำหรับทดสอบ: admin / admin123</p>
     </div>
@@ -96,8 +105,8 @@
           <h1>🏥 Aura Clinic Admin System</h1>
           <p class="muted">ระบบจัดการผู้ใช้บริการ คลังสินค้า การนัดหมาย การค้นหาข้อมูล และการสำรอง/กู้คืนข้อมูล</p>
         </div>
-        <div class="actions">
-          <a href="system_tools.php" id="systemToolsBtn" class="btn-info hidden" style="text-decoration:none; padding:10px 14px; border-radius:10px; font-weight:600;">เครื่องมือระบบ</a>
+        <div class="actions" style="display:flex; align-items:center; gap: 16px;">
+          <a href="system_tools.php" id="systemToolsBtn" class="btn-info hidden" style="text-decoration:none; padding:12px 20px; border-radius:12px; font-weight:700; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.3); transition: transform 0.2s; display:inline-block; font-size: 15px;">⚙️ เครื่องมือ SuperAdmin</a>
           <div id="currentUser" class="user-badge">กำลังโหลดผู้ใช้...</div>
           <button id="logoutBtn" class="btn-secondary" type="button">ออกจากระบบ</button>
         </div>
@@ -110,6 +119,17 @@
         <div class="summary-box"><div class="muted">นัดหมายรอดำเนินการ</div><div class="summary-number" id="sumPending">0</div></div>
         <div class="summary-box"><div class="muted">รายการคลังสินค้า</div><div class="summary-number" id="sumInventory">0</div></div>
         <div class="summary-box"><div class="muted">สินค้าใกล้หมด</div><div class="summary-number" id="sumLowStock">0</div></div>
+      </section>
+
+      <section class="grid grid-2" id="chartsGrid" style="margin-bottom: 20px;">
+        <div class="card" style="margin-bottom: 0;">
+          <h3 style="margin-bottom: 16px;">📊 สัดส่วนสถานะการนัดหมาย (Status)</h3>
+          <div style="height: 250px;"><canvas id="statusChart"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom: 0;">
+          <h3 style="margin-bottom: 16px;">📈 5 อันดับบริการยอดนิยม (Top Services)</h3>
+          <div style="height: 250px;"><canvas id="serviceChart"></canvas></div>
+        </div>
       </section>
 
       <section class="card">
@@ -219,7 +239,8 @@
       appointments: 'api/appointments.php',
       logs: 'api/staff_logs.php',
       backup: 'api/system_backup.php',
-      restore: 'api/system_restore.php'
+      restore: 'api/system_restore.php',
+      verifyOtp: 'api/auth_verify_otp.php'
     };
 
     let currentUser = null;
@@ -310,12 +331,63 @@
       appSection.classList.toggle('hidden', !isLoggedIn);
     }
 
+    let statusChartInstance = null;
+    let serviceChartInstance = null;
+
     async function loadSummary() {
       const data = await apiFetch(API.summary);
       document.getElementById('sumAppointments').textContent = data.totalAppointments;
       document.getElementById('sumPending').textContent = data.pendingAppointments;
       document.getElementById('sumInventory').textContent = data.totalInventoryItems;
       document.getElementById('sumLowStock').textContent = data.lowStockItems;
+
+      if (data.statusStats && data.serviceStats) {
+        renderCharts(data.statusStats, data.serviceStats);
+      }
+    }
+
+    function renderCharts(statusStats, serviceStats) {
+      if (!window.Chart) return;
+      const statusCtx = document.getElementById('statusChart').getContext('2d');
+      const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+
+      if (statusChartInstance) statusChartInstance.destroy();
+      if (serviceChartInstance) serviceChartInstance.destroy();
+
+      const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#8b5cf6'];
+
+      statusChartInstance = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+          labels: statusStats.map(s => s.status),
+          datasets: [{
+            data: statusStats.map(s => s.count),
+            backgroundColor: colors,
+            borderWidth: 0
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+      });
+
+      serviceChartInstance = new Chart(serviceCtx, {
+        type: 'bar',
+        data: {
+          labels: serviceStats.map(s => s.service_name),
+          datasets: [{
+            label: 'จำนวนนัดหมาย',
+            data: serviceStats.map(s => s.count),
+            backgroundColor: 'rgba(232, 117, 184, 0.8)',
+            borderColor: '#d25a9e',
+            borderWidth: 1,
+            borderRadius: 6
+          }]
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false,
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+      });
     }
 
     async function loadAppointments() {
@@ -387,17 +459,7 @@
       }).join('') : '<tr><td colspan="6" class="muted">ไม่พบข้อมูลคลังสินค้า</td></tr>';
     }
 
-    async function loadLogs() {
-      const data = await apiFetch(API.logs);
-      const tbody = document.getElementById('logsBody');
-      tbody.innerHTML = data.length ? data.map(log => `
-        <tr>
-          <td>${formatDateTime(log.created_at)}</td>
-          <td>${log.staff_name}</td>
-          <td>${log.action_text}</td>
-        </tr>
-      `).join('') : '<tr><td colspan="3" class="muted">ยังไม่มีประวัติการทำรายการ</td></tr>';
-    }
+
 
     function resetAppointmentForm() {
       document.getElementById('appointmentForm').reset();
@@ -485,65 +547,105 @@
       }
     }
 
-    async function downloadBackup() {
-      try {
-        await apiDownload(API.backup);
-        showMessage(appMessage, 'ดาวน์โหลดไฟล์สำรองข้อมูลเรียบร้อย');
-        await loadLogs();
-      } catch (error) {
-        showMessage(appMessage, error.message, 'error');
-      }
-    }
 
-    async function restoreBackup() {
-      const file = backupFileInput.files[0];
-      if (!file) {
-        showMessage(appMessage, 'กรุณาเลือกไฟล์สำรองข้อมูลก่อน', 'error');
-        return;
-      }
-
-      if (!confirm('การกู้คืนข้อมูลจะเขียนทับข้อมูลปัจจุบันทั้งหมดในระบบ\n\nต้องการดำเนินการต่อหรือไม่?')) {
-        return;
-      }
-
-      try {
-        const text = await file.text();
-        const backup = JSON.parse(text);
-        await apiFetch(API.restore, {
-          method: 'POST',
-          body: JSON.stringify({ backup })
-        });
-        backupFileInput.value = '';
-        showMessage(appMessage, 'กู้คืนข้อมูลระบบเรียบร้อย');
-        await refreshAll();
-      } catch (error) {
-        showMessage(appMessage, error.message || 'ไม่สามารถกู้คืนข้อมูลได้', 'error');
-      }
-    }
 
     async function refreshAll() {
-      await Promise.all([loadSummary(), loadAppointments(), loadInventory(), loadLogs()]);
+      await Promise.all([loadSummary(), loadAppointments(), loadInventory()]);
     }
+
+    let isOtpMode = false;
+    let resendTimer = null;
+
+    function startResendTimer() {
+      const btn = document.getElementById('resendOtpBtn');
+      if (!btn) return;
+      btn.disabled = true;
+      let timeLeft = 60;
+      btn.textContent = `รอ ${timeLeft}s`;
+      clearInterval(resendTimer);
+      resendTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(resendTimer);
+          btn.textContent = 'ส่งใหม่อีกครั้ง';
+          btn.disabled = false;
+        } else {
+          btn.textContent = `รอ ${timeLeft}s`;
+        }
+      }, 1000);
+    }
+
+    document.getElementById('resendOtpBtn')?.addEventListener('click', async () => {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      try {
+        const data = await apiFetch(API.login, {
+          method: 'POST',
+          body: JSON.stringify({ username, password })
+        });
+        if(data.require_otp) {
+          showMessage(loginMessage, data.message, 'success');
+          startResendTimer();
+        }
+      } catch (error) {
+        showMessage(loginMessage, error.message, 'error');
+      }
+    });
 
     document.getElementById('loginForm').addEventListener('submit', async (event) => {
       event.preventDefault();
       hideMessage(loginMessage);
       try {
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value;
-        const data = await apiFetch(API.login, {
-          method: 'POST',
-          body: JSON.stringify({ username, password })
-        });
-        currentUser = data.user;
-        currentUserEl.textContent = `${currentUser.full_name} (${currentUser.role})`;
-        if (currentUser.role === 'superadmin') systemToolsBtn.classList.remove('hidden');
-        renderAppMode(true);
-        showMessage(appMessage, 'เข้าสู่ระบบสำเร็จ');
-        await refreshAll();
+        if(!isOtpMode) {
+          const username = document.getElementById('username').value.trim();
+          const password = document.getElementById('password').value;
+          const data = await apiFetch(API.login, {
+            method: 'POST',
+            body: JSON.stringify({ username, password })
+          });
+          if(data.require_otp) {
+             isOtpMode = true;
+             document.getElementById('passwordField').classList.add('hidden');
+             document.getElementById('otpField').classList.remove('hidden');
+             document.getElementById('loginSubmitBtn').textContent = 'ยืนยัน OTP';
+             document.getElementById('loginBackBtn').classList.remove('hidden');
+             showMessage(loginMessage, data.message, 'success');
+             startResendTimer();
+          }
+        } else {
+          const otp = document.getElementById('otp').value.trim();
+          const data = await apiFetch(API.verifyOtp, {
+            method: 'POST',
+            body: JSON.stringify({ otp })
+          });
+          currentUser = data.user;
+          currentUserEl.textContent = `${currentUser.full_name} (${currentUser.role})`;
+          if (currentUser.role === 'superadmin') {
+            document.getElementById('systemToolsBtn').classList.remove('hidden');
+          }
+          renderAppMode(true);
+          showMessage(appMessage, 'เข้าสู่ระบบสำเร็จ');
+          resetLoginForm();
+          await refreshAll();
+        }
       } catch (error) {
         showMessage(loginMessage, error.message, 'error');
       }
+    });
+
+    function resetLoginForm() {
+       isOtpMode = false;
+       document.getElementById('passwordField').classList.remove('hidden');
+       document.getElementById('otpField').classList.add('hidden');
+       document.getElementById('loginSubmitBtn').textContent = 'เข้าสู่ระบบ';
+       document.getElementById('loginBackBtn').classList.add('hidden');
+       document.getElementById('loginForm').reset();
+       clearInterval(resendTimer);
+    }
+
+    document.getElementById('loginBackBtn').addEventListener('click', () => {
+       resetLoginForm();
+       hideMessage(loginMessage);
     });
 
     document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -611,9 +713,7 @@
     document.getElementById('inventoryCancelEditBtn').addEventListener('click', resetInventoryForm);
     document.getElementById('appointmentSearchBtn').addEventListener('click', loadAppointments);
     document.getElementById('inventorySearchBtn').addEventListener('click', loadInventory);
-    document.getElementById('refreshLogsBtn').addEventListener('click', loadLogs);
-    document.getElementById('downloadBackupBtn').addEventListener('click', downloadBackup);
-    document.getElementById('restoreBackupBtn').addEventListener('click', restoreBackup);
+
 
     document.getElementById('appointmentClearBtn').addEventListener('click', () => {
       document.getElementById('appointmentSearch').value = '';

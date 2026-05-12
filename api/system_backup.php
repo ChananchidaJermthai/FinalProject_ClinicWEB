@@ -20,10 +20,10 @@ $backup = [
     ],
 ];
 
-$filename = 'aura_clinic_backup_' . date('Ymd_His') . '.json';
-log_action($user['full_name'], 'สำรองข้อมูลระบบ (' . $filename . ')');
+$filename = 'aura_clinic_backup_' . date('Ymd_His') . '.enc';
+log_action($user['full_name'], $user['role'], 'สำรองข้อมูลระบบ (เข้ารหัส)', null);
 
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: application/octet-stream');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
-echo json_encode($backup, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+echo encrypt_backup($backup);
 exit;

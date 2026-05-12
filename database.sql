@@ -8,10 +8,15 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     password_hash CHAR(64) NOT NULL,
     full_name VARCHAR(120) NOT NULL,
+    phone VARCHAR(30) NULL,
     role VARCHAR(50) NOT NULL DEFAULT 'admin',
     is_active TINYINT(1) NOT NULL DEFAULT 1,
+    failed_attempts INT NOT NULL DEFAULT 0,
+    locked_until DATETIME NULL,
+    otp_code VARCHAR(10) NULL,
+    otp_expires DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE inventory (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,7 +26,7 @@ CREATE TABLE inventory (
     min_quantity INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE appointments (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -33,19 +38,21 @@ CREATE TABLE appointments (
     notes TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE staff_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     staff_name VARCHAR(120) NOT NULL,
+    admin_role VARCHAR(50) NOT NULL DEFAULT 'system',
     action_text VARCHAR(255) NOT NULL,
+    key_result_id INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO users (username, password_hash, full_name, role)
+INSERT INTO users (username, password_hash, full_name, phone, role)
 VALUES
-('admin', SHA2('admin123', 256), 'Clinic Admin', 'admin'),
-('superadmin', SHA2('super123', 256), 'System Admin', 'superadmin');
+('admin', SHA2('admin123', 256), 'Clinic Admin', '0811111111', 'admin'),
+('superadmin', SHA2('super123', 256), 'System Admin', '0899999999', 'superadmin');
 
 INSERT INTO inventory (item_name, quantity, unit, min_quantity)
 VALUES
@@ -53,7 +60,7 @@ VALUES
 ('Vitamin C Serum', 20, 'ขวด', 8),
 ('Disposable Syringe 5ml', 100, 'ชิ้น', 30),
 ('Medical Gloves', 40, 'กล่อง', 15),
-('Cotton Pads', 75, 'แพ็ก', 20);
+('Cotton Pads', 75, 'แพ็ก', 20); 
 
 INSERT INTO appointments (customer_name, phone, service_name, app_date, status, notes)
 VALUES
@@ -62,7 +69,7 @@ VALUES
 ('Kanya T.', '0861122334', 'IV Drip', '2026-04-03 11:00:00', 'completed', 'ลูกค้าเก่า'),
 ('Nida R.', '0839988776', 'Laser Treatment', '2026-04-04 16:30:00', 'cancelled', 'เลื่อนนัด');
 
-INSERT INTO staff_logs (staff_name, action_text)
+INSERT INTO staff_logs (staff_name, admin_role, action_text, key_result_id)
 VALUES
-('System', 'สร้างข้อมูลเริ่มต้นของระบบ Aura Clinic'),
-('System', 'พร้อมใช้งานสำหรับ admin login');
+('System', 'system', 'สร้างข้อมูลเริ่มต้นของระบบ Aura Clinic', NULL),
+('System', 'system', 'พร้อมใช้งานสำหรับ admin login', NULL);

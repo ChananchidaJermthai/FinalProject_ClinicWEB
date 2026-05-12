@@ -19,5 +19,5 @@ execute_query(
     [$quantity, $id]
 );
 
-log_action($user['full_name'], 'อัปเดต stock ID ' . $id . ' เป็น ' . $quantity);
+log_action($user['full_name'], $user['role'], 'อัปเดตสต๊อกสินค้า', $id);
 json_response(['message' => 'อัปเดต stock เรียบร้อย']);

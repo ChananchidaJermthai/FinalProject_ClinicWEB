@@ -52,7 +52,7 @@ if ($method === 'POST') {
     );
 
     $id = (int)get_db()->lastInsertId();
-    log_action($user['full_name'], 'เพิ่มนัดหมายใหม่ของ ' . $customerName);
+    log_action($user['full_name'], $user['role'], 'เพิ่มข้อมูลนัดหมาย', $id);
     raw_json_response(query_one('SELECT * FROM appointments WHERE id = ?', [$id]), 201);
 }
 
@@ -75,7 +75,7 @@ if ($method === 'PUT') {
         [$customerName, $phone !== '' ? $phone : null, $serviceName, $appDate, $status, $notes !== '' ? $notes : null, $id]
     );
 
-    log_action($user['full_name'], 'แก้ไขนัดหมาย ID ' . $id . ' ของ ' . $customerName);
+    log_action($user['full_name'], $user['role'], 'แก้ไขข้อมูลนัดหมาย', $id);
     raw_json_response(query_one('SELECT * FROM appointments WHERE id = ?', [$id]));
 }
 
@@ -93,7 +93,7 @@ if ($method === 'DELETE') {
     }
 
     execute_query('DELETE FROM appointments WHERE id = ?', [$id]);
-    log_action($user['full_name'], 'ลบนัดหมายของ ' . $appointment['customer_name']);
+    log_action($user['full_name'], $user['role'], 'ลบข้อมูลนัดหมาย', $id);
     json_response(['message' => 'ลบนัดหมายเรียบร้อย']);
 }
 

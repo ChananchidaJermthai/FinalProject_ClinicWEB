@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/common.php';
 $user = require_auth();
-log_action($user['full_name'], 'ออกจากระบบ (' . $user['username'] . ')');
+log_action($user['full_name'], $user['role'], 'ออกจากระบบ (' . $user['username'] . ')');
 $_SESSION = [];
 if (ini_get('session.use_cookies')) {
     $params = session_get_cookie_params();
